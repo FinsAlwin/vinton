@@ -21,6 +21,7 @@ import {
 } from "@/components/admin/ui/dropdown-menu";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
+import { useToast } from "@/components/admin/ui/use-toast";
 
 export default function EditContentPage({
   params,
@@ -29,6 +30,7 @@ export default function EditContentPage({
 }) {
   const { type, id } = use(params);
   const router = useRouter();
+  const { toast } = useToast();
   const { content, isLoading: contentLoading } = useContentItem(type, id);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -75,15 +77,28 @@ export default function EditContentPage({
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.error || "Failed to update content");
+        toast({
+          title: "Update failed",
+          description: data.error || "Failed to update content",
+          variant: "destructive",
+        });
         setLoading(false);
         return;
       }
 
+      toast({
+        title: "Success!",
+        description: "Content updated successfully",
+        variant: "success",
+      });
       router.push(`/admin/content/${type}`);
       router.refresh();
     } catch {
-      alert("An error occurred");
+      toast({
+        title: "Error",
+        description: "An error occurred while updating content",
+        variant: "destructive",
+      });
       setLoading(false);
     }
   };

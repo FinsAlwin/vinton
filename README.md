@@ -137,6 +137,58 @@ src/
 └── middleware.ts            # Route protection
 ```
 
+## Admin UI Components
+
+### Alert
+
+- Import from `@/components/admin/ui/alert`.
+- Variants: `default | info | success | warning | destructive`.
+- Example:
+
+```tsx
+import {
+  Alert,
+  AlertTitle,
+  AlertDescription,
+} from "@/components/admin/ui/alert";
+
+<Alert variant="success">
+  <AlertTitle>Saved</AlertTitle>
+  <AlertDescription>Your changes have been saved.</AlertDescription>
+</Alert>;
+```
+
+### Toasts
+
+- Toaster is globally wired in `src/app/layout.tsx`.
+- Use via hook:
+
+```tsx
+import { useToast } from "@/components/admin/ui/use-toast";
+
+const { toast } = useToast();
+toast({ title: "Deleted", description: "Item removed.", variant: "success" });
+```
+
+### ConfirmDeleteDialog
+
+- Import from `@/components/admin/ui/confirm-delete-dialog`.
+- Props: `open`, `onOpenChange`, `resourceName?`, `confirmationText?`, `confirmLabel?`, `cancelLabel?`, `onConfirm`.
+- Example:
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<ConfirmDeleteDialog
+  open={open}
+  onOpenChange={setOpen}
+  resourceName="this item"
+  onConfirm={async () => {
+    /* call DELETE */
+  }}
+/>;
+```
+
 ## API Documentation
 
 ### Authentication

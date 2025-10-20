@@ -1,4 +1,4 @@
-import mongoose, { Schema, Model } from "mongoose";
+import mongooseInstance, { Schema, Model } from "mongoose";
 
 export interface ISettings {
   key: string;
@@ -35,7 +35,7 @@ const SettingsSchema = new Schema<ISettings>(
 );
 
 const Settings: Model<ISettings> =
-  mongoose.models.Settings ||
-  mongoose.model<ISettings>("Settings", SettingsSchema);
+  mongooseInstance.models.Settings ||
+  mongooseInstance.model<ISettings>("Settings", SettingsSchema);
 
 export default Settings;

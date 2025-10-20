@@ -8,7 +8,7 @@ const REFRESH_TOKEN_SECRET = new TextEncoder().encode(
   process.env.JWT_REFRESH_SECRET || "refresh-secret-key-change-in-production"
 );
 
-const ACCESS_TOKEN_EXPIRES_IN = "15m"; // 15 minutes
+const ACCESS_TOKEN_EXPIRES_IN = "1d"; // 1 day
 const REFRESH_TOKEN_EXPIRES_IN = "7d"; // 7 days
 
 export interface CustomJWTPayload {
@@ -69,7 +69,7 @@ export async function setAuthCookies(
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 15 * 60, // 15 minutes
+    maxAge: 24 * 60 * 60, // 1 day
     path: "/",
   });
 

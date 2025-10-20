@@ -4,7 +4,17 @@ import useSWR, { SWRConfiguration } from "swr";
 import type { ApiResponse, Content, Media, ContentFilters } from "@/types";
 
 const fetcher = async <T = unknown>(url: string): Promise<T> => {
-  const res = await fetch(url);
+  // First attempt
+  let res = await fetch(url);
+
+  // If unauthorized, try refresh flow once
+  if (res.status === 401) {
+    const refreshRes = await fetch("/api/auth/refresh", { method: "POST" });
+    if (refreshRes.ok) {
+      res = await fetch(url);
+    }
+  }
+
   if (!res.ok) {
     const info = await res.json().catch(() => ({}));
     const error = new Error(

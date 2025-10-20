@@ -7,14 +7,8 @@ import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
 import { Badge } from "@/components/admin/ui/badge";
 import { Card } from "@/components/admin/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/admin/ui/dialog";
+import { ConfirmDeleteDialog } from "@/components/admin/ui/confirm-delete-dialog";
+import { useToast } from "@/components/admin/ui/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +26,7 @@ export default function ContentListPage({
 }) {
   const { type } = use(params);
   const router = useRouter();
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<"" | "draft" | "published">(
@@ -61,12 +56,25 @@ export default function ContentListPage({
       if (response.ok) {
         mutate();
         setDeleteDialog({ open: false, id: null, title: "" });
+        toast({
+          title: "Deleted",
+          description: "Content deleted successfully.",
+          variant: "success",
+        });
       } else {
         const error = await response.json();
-        alert(error.error || "Delete failed");
+        toast({
+          title: "Delete failed",
+          description: error.error || "Something went wrong.",
+          variant: "destructive",
+        });
       }
     } catch {
-      alert("Delete failed");
+      toast({
+        title: "Delete failed",
+        description: "Network error.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -225,33 +233,12 @@ export default function ContentListPage({
       )}
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
+      <ConfirmDeleteDialog
         open={deleteDialog.open}
         onOpenChange={(open) => setDeleteDialog({ open, id: null, title: "" })}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Content</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete &quot;{deleteDialog.title}&quot;?
-              This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() =>
-                setDeleteDialog({ open: false, id: null, title: "" })
-              }
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        resourceName={`"${deleteDialog.title}"`}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

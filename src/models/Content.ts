@@ -1,4 +1,4 @@
-import mongoose, { Schema, Model } from "mongoose";
+import mongooseInstance, { Schema, Model, Types } from "mongoose";
 
 export interface IContentField {
   key: string;
@@ -28,7 +28,7 @@ export interface IContent {
     author?: string;
     featuredImage?: string;
   };
-  media: mongoose.Types.ObjectId[];
+  media: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -115,6 +115,7 @@ ContentSchema.index({ contentType: 1, status: 1 });
 ContentSchema.index({ contentType: 1, slug: 1 });
 
 const Content: Model<IContent> =
-  mongoose.models.Content || mongoose.model<IContent>("Content", ContentSchema);
+  mongooseInstance.models.Content ||
+  mongooseInstance.model<IContent>("Content", ContentSchema);
 
 export default Content;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Media from "@/models/Media";
+import "@/models/User"; // ensure User model is registered for populate
 import {
   getCurrentUser,
   extractBearerToken,

@@ -20,6 +20,7 @@ import {
 } from "@/components/admin/ui/dropdown-menu";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
+import { useToast } from "@/components/admin/ui/use-toast";
 
 export default function NewContentPage({
   params,
@@ -28,6 +29,7 @@ export default function NewContentPage({
 }) {
   const { type } = use(params);
   const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -57,15 +59,28 @@ export default function NewContentPage({
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.error || "Failed to create content");
+        toast({
+          title: "Creation failed",
+          description: data.error || "Failed to create content",
+          variant: "destructive",
+        });
         setLoading(false);
         return;
       }
 
+      toast({
+        title: "Success!",
+        description: "Content created successfully",
+        variant: "success",
+      });
       router.push(`/admin/content/${type}`);
       router.refresh();
     } catch {
-      alert("An error occurred");
+      toast({
+        title: "Error",
+        description: "An error occurred while creating content",
+        variant: "destructive",
+      });
       setLoading(false);
     }
   };

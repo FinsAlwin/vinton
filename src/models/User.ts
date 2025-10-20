@@ -1,4 +1,4 @@
-import mongoose, { Schema, Model } from "mongoose";
+import mongooseInstance, { Schema, Model } from "mongoose";
 
 export interface IUser {
   email: string;
@@ -43,6 +43,7 @@ const UserSchema = new Schema<IUser>(
 
 // Prevent model recompilation in development
 const User: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+  mongooseInstance.models.User ||
+  mongooseInstance.model<IUser>("User", UserSchema);
 
 export default User;

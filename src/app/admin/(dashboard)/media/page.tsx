@@ -6,18 +6,13 @@ import { useMedia } from "@/hooks/useSWR";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
 import { Card } from "@/components/admin/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/admin/ui/dialog";
+import { ConfirmDeleteDialog } from "@/components/admin/ui/confirm-delete-dialog";
+import { useToast } from "@/components/admin/ui/use-toast";
 import { Upload, Trash2, Search, Grid3x3, List, Copy } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default function MediaLibraryPage() {
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -49,12 +44,25 @@ export default function MediaLibraryPage() {
 
       if (response.ok) {
         mutate();
+        toast({
+          title: "Success!",
+          description: "File uploaded successfully",
+          variant: "success",
+        });
       } else {
         const error = await response.json();
-        alert(error.error || "Upload failed");
+        toast({
+          title: "Upload failed",
+          description: error.error || "Failed to upload file",
+          variant: "destructive",
+        });
       }
     } catch {
-      alert("Upload failed");
+      toast({
+        title: "Upload failed",
+        description: "Network error occurred",
+        variant: "destructive",
+      });
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -72,18 +80,35 @@ export default function MediaLibraryPage() {
       if (response.ok) {
         mutate();
         setDeleteDialog({ open: false, id: null });
+        toast({
+          title: "Deleted",
+          description: "Media deleted successfully.",
+          variant: "success",
+        });
       } else {
         const error = await response.json();
-        alert(error.error || "Delete failed");
+        toast({
+          title: "Delete failed",
+          description: error.error || "Something went wrong.",
+          variant: "destructive",
+        });
       }
     } catch {
-      alert("Delete failed");
+      toast({
+        title: "Delete failed",
+        description: "Network error.",
+        variant: "destructive",
+      });
     }
   };
 
   const copyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
-    alert("URL copied to clipboard!");
+    toast({
+      title: "Copied!",
+      description: "URL copied to clipboard",
+      variant: "success",
+    });
   };
 
   return (
@@ -304,31 +329,12 @@ export default function MediaLibraryPage() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
+      <ConfirmDeleteDialog
         open={deleteDialog.open}
         onOpenChange={(open) => setDeleteDialog({ open, id: null })}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Media</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this file? This action cannot be
-              undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialog({ open: false, id: null })}
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        resourceName="this file"
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

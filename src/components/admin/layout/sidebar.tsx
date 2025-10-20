@@ -8,15 +8,11 @@ import {
   Image,
   Settings,
   ChevronLeft,
-  Moon,
-  Sun,
   Menu,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/admin/ui/button";
-import { Switch } from "@/components/admin/ui/switch";
-import { useTheme } from "@/components/admin/theme-provider";
 import { useState, useEffect } from "react";
 
 type SidebarItem = {
@@ -58,37 +54,8 @@ export function AdminSidebar({
   initialCollapsed = false,
 }: AdminSidebarProps) {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
-
-  // Properly detect if dark mode is active (handles system theme)
-  useEffect(() => {
-    const checkDarkMode = () => {
-      if (theme === "dark") {
-        setIsDark(true);
-      } else if (theme === "light") {
-        setIsDark(false);
-      } else {
-        // system theme
-        setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
-      }
-    };
-
-    checkDarkMode();
-
-    // Listen for system theme changes
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => {
-      if (theme === "system") {
-        setIsDark(mediaQuery.matches);
-      }
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [theme]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -109,7 +76,7 @@ export function AdminSidebar({
       {/* Mobile Menu Button */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+        className="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-lg bg-card border border-border shadow-lg hover:bg-accent text-foreground"
         aria-label="Toggle menu"
       >
         {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -118,7 +85,7 @@ export function AdminSidebar({
       {/* Mobile Overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/80 z-30 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -126,9 +93,9 @@ export function AdminSidebar({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-40 h-screen border-r transition-all duration-300",
-          // Solid opaque backgrounds for both light and dark modes
-          "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700",
+          "fixed left-0 top-0 z-40 h-screen border-r border-border transition-all duration-300",
+          // Solid opaque background with backdrop blur for mobile
+          "bg-card backdrop-blur-sm",
           "shadow-xl lg:shadow-none",
           // Desktop (always visible, width changes based on collapsed state)
           collapsed ? "lg:w-16" : "lg:w-64",
@@ -136,15 +103,13 @@ export function AdminSidebar({
           "w-64",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
+        style={{ backgroundColor: "hsl(var(--card))" }}
       >
         <div className="flex h-full flex-col">
           {/* Logo/Header */}
-          <div className="flex h-16 items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4">
+          <div className="flex h-16 items-center justify-between border-b border-border px-4">
             {!collapsed && (
-              <Link
-                href="/admin"
-                className="text-xl font-bold text-gray-900 dark:text-white"
-              >
+              <Link href="/admin" className="text-xl font-bold text-foreground">
                 Vinton Admin
               </Link>
             )}
@@ -177,10 +142,10 @@ export function AdminSidebar({
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all relative",
                     isActive
-                      ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
+                      ? "bg-primary/20 text-primary border-l-4 border-primary shadow-sm hover:bg-primary/30"
+                      : "text-muted-foreground border-l-4 border-transparent hover:bg-accent hover:text-foreground hover:border-accent",
                     collapsed && "justify-center"
                   )}
                   title={collapsed ? item.title : undefined}
@@ -191,56 +156,6 @@ export function AdminSidebar({
               );
             })}
           </nav>
-
-          {/* Theme Toggle */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-            {!collapsed ? (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    Theme
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {isDark ? "Dark" : "Light"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Sun
-                    className={cn(
-                      "h-4 w-4",
-                      !isDark ? "text-blue-600" : "text-gray-400"
-                    )}
-                  />
-                  <Switch
-                    checked={isDark}
-                    onCheckedChange={(checked) =>
-                      setTheme(checked ? "dark" : "light")
-                    }
-                  />
-                  <Moon
-                    className={cn(
-                      "h-4 w-4",
-                      isDark ? "text-blue-500" : "text-gray-400"
-                    )}
-                  />
-                </div>
-              </div>
-            ) : (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(isDark ? "light" : "dark")}
-                title={`Switch to ${isDark ? "light" : "dark"} mode`}
-                className="w-full"
-              >
-                {isDark ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </Button>
-            )}
-          </div>
         </div>
       </aside>
     </>

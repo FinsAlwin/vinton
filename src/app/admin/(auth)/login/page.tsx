@@ -52,24 +52,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white dark:bg-slate-950 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
-        <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-slate-900 shadow-xl">
+        <Card className="border border-border bg-card shadow-xl">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center text-gray-900 dark:text-white">
+            <CardTitle className="text-2xl font-bold text-center text-foreground">
               Vinton Admin
             </CardTitle>
-            <CardDescription className="text-center text-gray-600 dark:text-gray-400">
+            <CardDescription className="text-center text-muted-foreground">
               Enter your credentials to access the admin panel
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <Label
-                  htmlFor="email"
-                  className="text-gray-800 dark:text-gray-200"
-                >
+                <Label htmlFor="email" className="text-foreground">
                   Email
                 </Label>
                 <Input
@@ -80,14 +77,10 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={loading}
-                  className="placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
               <div className="space-y-2">
-                <Label
-                  htmlFor="password"
-                  className="text-gray-800 dark:text-gray-200"
-                >
+                <Label htmlFor="password" className="text-foreground">
                   Password
                 </Label>
                 <Input
@@ -98,17 +91,16 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
-                  className="placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
               {error && (
-                <div className="rounded-md border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 p-3 text-sm text-red-700 dark:text-red-300">
+                <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
                   {error}
                 </div>
               )}
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white dark:text-white shadow-md"
+                className="w-full shadow-md"
                 disabled={loading}
               >
                 {loading ? "Signing in..." : "Sign in"}
@@ -116,7 +108,7 @@ export default function LoginPage() {
             </form>
           </CardContent>
         </Card>
-        <p className="mt-4 text-center text-xs text-gray-500 dark:text-gray-500">
+        <p className="mt-4 text-center text-xs text-muted-foreground">
           © {new Date().getFullYear()} Vinton. All rights reserved.
         </p>
       </div>

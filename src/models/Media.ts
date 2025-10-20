@@ -1,4 +1,4 @@
-import mongoose, { Schema, Model } from "mongoose";
+import mongooseInstance, { Schema, Model, Types } from "mongoose";
 
 export interface IMedia {
   filename: string;
@@ -9,7 +9,7 @@ export interface IMedia {
   mimeType: string;
   width?: number;
   height?: number;
-  uploadedBy: mongoose.Types.ObjectId;
+  uploadedBy: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -62,6 +62,7 @@ MediaSchema.index({ uploadedBy: 1 });
 MediaSchema.index({ mimeType: 1 });
 
 const Media: Model<IMedia> =
-  mongoose.models.Media || mongoose.model<IMedia>("Media", MediaSchema);
+  mongooseInstance.models.Media ||
+  mongooseInstance.model<IMedia>("Media", MediaSchema);
 
 export default Media;
