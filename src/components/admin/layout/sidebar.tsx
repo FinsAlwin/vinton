@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   FileText,
-  Image,
+  Image as ImageIcon,
   Settings,
   ChevronLeft,
   Menu,
@@ -14,6 +14,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/admin/ui/button";
 import { useState, useEffect } from "react";
+import { useSetting } from "@/hooks/useSettings";
+import Image from "next/image";
 
 type SidebarItem = {
   title: string;
@@ -35,7 +37,7 @@ const defaultMenuItems: SidebarItem[] = [
   {
     title: "Media",
     href: "/admin/media",
-    icon: Image,
+    icon: ImageIcon,
   },
   {
     title: "Settings",
@@ -56,6 +58,8 @@ export function AdminSidebar({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const siteLogo = useSetting<string>("site_logo");
+  const siteName = useSetting<string>("site_name", "Vinton");
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -109,15 +113,39 @@ export function AdminSidebar({
           {/* Logo/Header */}
           <div className="flex h-16 items-center justify-between border-b border-border px-4">
             {!collapsed && (
-              <Link href="/admin" className="text-xl font-bold text-foreground">
-                Vinton Admin
+              <Link href="/admin" className="flex items-center gap-2">
+                {siteLogo && (
+                  <div className="relative w-8 h-8">
+                    <Image
+                      src={siteLogo}
+                      alt={siteName || "Admin"}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                )}
+                <span className="text-xl font-bold text-foreground">
+                  {siteName || "Vinton"} Admin
+                </span>
+              </Link>
+            )}
+            {collapsed && siteLogo && (
+              <Link href="/admin" className="flex items-center">
+                <div className="relative w-8 h-8">
+                  <Image
+                    src={siteLogo}
+                    alt={siteName || "Admin"}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
               </Link>
             )}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setCollapsed(!collapsed)}
-              className={cn(collapsed && "mx-auto")}
+              className={cn(collapsed && !siteLogo && "mx-auto")}
             >
               <ChevronLeft
                 className={cn(

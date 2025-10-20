@@ -11,6 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import { useSetting } from "@/hooks/useSettings";
+import Image from "next/image";
 
 interface AdminHeaderProps {
   user?: {
@@ -21,6 +23,8 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ user }: AdminHeaderProps) {
   const router = useRouter();
+  const siteLogo = useSetting<string>("site_logo");
+  const siteName = useSetting<string>("site_name", "Vinton");
 
   const handleLogout = async () => {
     try {
@@ -39,7 +43,17 @@ export function AdminHeader({ user }: AdminHeaderProps) {
       <div className="lg:hidden w-12">
         {/* Spacer for mobile menu button */}
       </div>
-      <div className="flex-1">
+      <div className="flex-1 flex items-center gap-3">
+        {siteLogo && (
+          <div className="relative w-8 h-8 hidden sm:block">
+            <Image
+              src={siteLogo}
+              alt={siteName || "Admin"}
+              fill
+              className="object-contain"
+            />
+          </div>
+        )}
         {/* Breadcrumbs or page title can go here */}
       </div>
 

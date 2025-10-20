@@ -17,13 +17,13 @@ declare global {
   var mongoose: CachedConnection | undefined;
 }
 
-const cached: CachedConnection = global.mongoose || {
+const cached: CachedConnection = (globalThis as typeof global).mongoose || {
   conn: null,
   promise: null,
 };
 
-if (!global.mongoose) {
-  global.mongoose = cached;
+if (!(globalThis as typeof global).mongoose) {
+  (globalThis as typeof global).mongoose = cached;
 }
 
 async function connectDB(): Promise<typeof mongoose> {
