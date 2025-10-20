@@ -19,6 +19,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
+import { FeaturedImagePicker } from "@/components/admin/ui/featured-image-picker";
+import { MediaGallery } from "@/components/admin/ui/media-gallery";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/components/admin/ui/use-toast";
@@ -42,7 +44,14 @@ export default function EditContentPage({
       seoTitle: "",
       seoDescription: "",
       seoKeywords: [] as string[],
+      featuredImage: "",
     },
+    media: [] as Array<{
+      _id: string;
+      url: string;
+      originalName: string;
+      mimeType: string;
+    }>,
   });
 
   useEffect(() => {
@@ -56,7 +65,9 @@ export default function EditContentPage({
           seoTitle: content.metadata?.seoTitle || "",
           seoDescription: content.metadata?.seoDescription || "",
           seoKeywords: content.metadata?.seoKeywords || [],
+          featuredImage: content.metadata?.featuredImage || "",
         },
+        media: content.media || [],
       });
     }
   }, [content]);
@@ -66,12 +77,18 @@ export default function EditContentPage({
     setLoading(true);
 
     try {
+      // Extract media IDs for API
+      const payload = {
+        ...formData,
+        media: formData.media.map((m) => m._id),
+      };
+
       const response = await fetch(`/api/content/${type}/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -189,6 +206,40 @@ export default function EditContentPage({
                 rows={4}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Featured Image */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Featured Image</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FeaturedImagePicker
+              imageUrl={formData.metadata.featuredImage}
+              onChange={(url) =>
+                setFormData({
+                  ...formData,
+                  metadata: {
+                    ...formData.metadata,
+                    featuredImage: url,
+                  },
+                })
+              }
+            />
+          </CardContent>
+        </Card>
+
+        {/* Media Gallery */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Media Gallery</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MediaGallery
+              media={formData.media}
+              onChange={(media) => setFormData({ ...formData, media })}
+            />
           </CardContent>
         </Card>
 
