@@ -56,6 +56,30 @@ export default function EditContentPage({
 
   useEffect(() => {
     if (content) {
+      // Handle media - convert if needed
+      const mediaArray = Array.isArray(content.media)
+        ? content.media
+            .map((item: unknown) => {
+              // If it's already a media object with required fields
+              if (
+                typeof item === "object" &&
+                item !== null &&
+                "_id" in item &&
+                "url" in item
+              ) {
+                return item as {
+                  _id: string;
+                  url: string;
+                  originalName: string;
+                  mimeType: string;
+                };
+              }
+              // If it's just an ID string, return empty for now (shouldn't happen with populated data)
+              return null;
+            })
+            .filter(Boolean)
+        : [];
+
       setFormData({
         title: content.title || "",
         description: content.description || "",
@@ -67,7 +91,12 @@ export default function EditContentPage({
           seoKeywords: content.metadata?.seoKeywords || [],
           featuredImage: content.metadata?.featuredImage || "",
         },
-        media: content.media || [],
+        media: mediaArray as Array<{
+          _id: string;
+          url: string;
+          originalName: string;
+          mimeType: string;
+        }>,
       });
     }
   }, [content]);

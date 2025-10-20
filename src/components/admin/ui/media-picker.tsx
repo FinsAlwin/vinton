@@ -78,6 +78,7 @@ export function MediaPicker({
     if (open && activeTab === "browse") {
       fetchMedia();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, activeTab, page, search]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,7 +96,7 @@ export function MediaPicker({
       });
 
       if (response.ok) {
-        const data = await response.json();
+        await response.json();
         toast({
           title: "Success!",
           description: "File uploaded successfully",

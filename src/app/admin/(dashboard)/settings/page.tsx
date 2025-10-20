@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -7,66 +8,546 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/admin/ui/card";
-import { Settings as SettingsIcon } from "lucide-react";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/admin/ui/alert";
+import { Button } from "@/components/admin/ui/button";
+import { Input } from "@/components/admin/ui/input";
+import { Label } from "@/components/admin/ui/label";
+import { Textarea } from "@/components/admin/ui/textarea";
+import { Switch } from "@/components/admin/ui/switch";
 import { useToast } from "@/components/admin/ui/use-toast";
+import { MediaPicker } from "@/components/admin/ui/media-picker";
+import { Save } from "lucide-react";
+import Image from "next/image";
+
+interface MediaItem {
+  _id: string;
+  url: string;
+  originalName: string;
+  mimeType: string;
+}
+
+interface SettingField {
+  key: string;
+  label: string;
+  type:
+    | "text"
+    | "email"
+    | "number"
+    | "password"
+    | "textarea"
+    | "toggle"
+    | "image";
+  category: string;
+  placeholder?: string;
+  description?: string;
+}
+
+const settingsConfig: SettingField[] = [
+  // General Settings
+  {
+    key: "site_name",
+    label: "Site Name",
+    type: "text",
+    category: "general",
+    placeholder: "My Awesome Website",
+    description: "The name of your website",
+  },
+  {
+    key: "site_tagline",
+    label: "Site Tagline",
+    type: "text",
+    category: "general",
+    placeholder: "Your site's tagline",
+    description: "A short description of your website",
+  },
+  {
+    key: "site_logo",
+    label: "Site Logo",
+    type: "image",
+    category: "general",
+    description: "Your website logo",
+  },
+  {
+    key: "site_favicon",
+    label: "Favicon",
+    type: "image",
+    category: "general",
+    description: "Website favicon (appears in browser tab)",
+  },
+  {
+    key: "contact_email",
+    label: "Contact Email",
+    type: "email",
+    category: "general",
+    placeholder: "contact@example.com",
+    description: "Primary contact email address",
+  },
+  {
+    key: "contact_phone",
+    label: "Contact Phone",
+    type: "text",
+    category: "general",
+    placeholder: "+1 (555) 123-4567",
+    description: "Contact phone number",
+  },
+  {
+    key: "contact_address",
+    label: "Address",
+    type: "textarea",
+    category: "general",
+    placeholder: "123 Main St, City, Country",
+    description: "Physical address or location",
+  },
+  {
+    key: "maintenance_mode",
+    label: "Maintenance Mode",
+    type: "toggle",
+    category: "general",
+    description: "Enable to show maintenance page to visitors",
+  },
+
+  // SEO Defaults
+  {
+    key: "seo_default_title",
+    label: "Default Meta Title",
+    type: "text",
+    category: "seo",
+    placeholder: "My Website - Tagline",
+    description: "Default title for pages without specific SEO title",
+  },
+  {
+    key: "seo_default_description",
+    label: "Default Meta Description",
+    type: "textarea",
+    category: "seo",
+    placeholder: "A brief description of your website...",
+    description: "Default description for search engines",
+  },
+  {
+    key: "seo_default_keywords",
+    label: "Default Meta Keywords",
+    type: "text",
+    category: "seo",
+    placeholder: "keyword1, keyword2, keyword3",
+    description: "Comma-separated keywords",
+  },
+  {
+    key: "seo_default_og_image",
+    label: "Default OG Image",
+    type: "image",
+    category: "seo",
+    description: "Default image for social media sharing",
+  },
+  {
+    key: "seo_google_analytics_id",
+    label: "Google Analytics ID",
+    type: "text",
+    category: "seo",
+    placeholder: "G-XXXXXXXXXX",
+    description: "Google Analytics tracking ID",
+  },
+  {
+    key: "seo_google_search_console",
+    label: "Google Search Console Verification",
+    type: "textarea",
+    category: "seo",
+    placeholder: "<meta name='google-site-verification' content='...' />",
+    description: "Google Search Console verification code",
+  },
+
+  // Social Media
+  {
+    key: "social_facebook",
+    label: "Facebook URL",
+    type: "text",
+    category: "social",
+    placeholder: "https://facebook.com/yourpage",
+    description: "Link to Facebook page",
+  },
+  {
+    key: "social_twitter",
+    label: "Twitter/X URL",
+    type: "text",
+    category: "social",
+    placeholder: "https://twitter.com/youraccount",
+    description: "Link to Twitter/X profile",
+  },
+  {
+    key: "social_instagram",
+    label: "Instagram URL",
+    type: "text",
+    category: "social",
+    placeholder: "https://instagram.com/youraccount",
+    description: "Link to Instagram profile",
+  },
+  {
+    key: "social_linkedin",
+    label: "LinkedIn URL",
+    type: "text",
+    category: "social",
+    placeholder: "https://linkedin.com/company/yourcompany",
+    description: "Link to LinkedIn profile",
+  },
+  {
+    key: "social_youtube",
+    label: "YouTube URL",
+    type: "text",
+    category: "social",
+    placeholder: "https://youtube.com/@yourchannel",
+    description: "Link to YouTube channel",
+  },
+  {
+    key: "social_github",
+    label: "GitHub URL",
+    type: "text",
+    category: "social",
+    placeholder: "https://github.com/yourusername",
+    description: "Link to GitHub profile",
+  },
+
+  // Email Settings
+  {
+    key: "email_smtp_host",
+    label: "SMTP Host",
+    type: "text",
+    category: "email",
+    placeholder: "smtp.example.com",
+    description: "SMTP server hostname",
+  },
+  {
+    key: "email_smtp_port",
+    label: "SMTP Port",
+    type: "number",
+    category: "email",
+    placeholder: "587",
+    description: "SMTP server port (usually 587 or 465)",
+  },
+  {
+    key: "email_smtp_username",
+    label: "SMTP Username",
+    type: "text",
+    category: "email",
+    placeholder: "your-email@example.com",
+    description: "SMTP authentication username",
+  },
+  {
+    key: "email_smtp_password",
+    label: "SMTP Password",
+    type: "password",
+    category: "email",
+    placeholder: "••••••••",
+    description: "SMTP authentication password",
+  },
+  {
+    key: "email_smtp_secure",
+    label: "Use SSL/TLS",
+    type: "toggle",
+    category: "email",
+    description: "Enable secure connection (SSL/TLS)",
+  },
+  {
+    key: "email_from_email",
+    label: "From Email",
+    type: "email",
+    category: "email",
+    placeholder: "noreply@example.com",
+    description: "Default sender email address",
+  },
+  {
+    key: "email_from_name",
+    label: "From Name",
+    type: "text",
+    category: "email",
+    placeholder: "My Website",
+    description: "Default sender name",
+  },
+];
+
+const categories = [
+  { id: "general", label: "General" },
+  { id: "seo", label: "SEO" },
+  { id: "social", label: "Social Media" },
+  { id: "email", label: "Email" },
+];
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage application settings and configuration
-        </p>
-      </div>
+  const [activeTab, setActiveTab] = useState("general");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [settings, setSettings] = useState<Record<string, unknown>>({});
+  const [hasChanges, setHasChanges] = useState(false);
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const [currentImageField, setCurrentImageField] = useState<string | null>(
+    null
+  );
 
-      <Alert variant="info">
-        <div>
-          <AlertTitle>Heads up</AlertTitle>
-          <AlertDescription>
-            Settings management interface is not yet implemented.
-          </AlertDescription>
-        </div>
-      </Alert>
+  useEffect(() => {
+    fetchSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      <Card>
-        <CardHeader>
+  const fetchSettings = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/settings");
+      const data = await response.json();
+
+      if (data.success) {
+        const settingsMap: Record<string, unknown> = {};
+        data.data.forEach((setting: { key: string; value: unknown }) => {
+          settingsMap[setting.key] = setting.value;
+        });
+        setSettings(settingsMap);
+      }
+    } catch (error) {
+      console.error("Failed to fetch settings:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load settings",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (key: string, value: unknown) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+    setHasChanges(true);
+  };
+
+  const handleImageSelect = (media: MediaItem | MediaItem[]) => {
+    if (currentImageField) {
+      const item = Array.isArray(media) ? media[0] : media;
+      handleChange(currentImageField, item.url);
+      setCurrentImageField(null);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const currentFields = settingsConfig.filter(
+        (field) => field.category === activeTab
+      );
+
+      const promises = currentFields.map((field) =>
+        fetch("/api/settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            key: field.key,
+            value: settings[field.key] ?? "",
+            category: field.category,
+            description: field.description,
+          }),
+        })
+      );
+
+      await Promise.all(promises);
+
+      setHasChanges(false);
+      toast({
+        title: "Success!",
+        description: "Settings saved successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Failed to save settings:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save settings",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleTabChange = (tabId: string) => {
+    if (hasChanges) {
+      if (
+        !confirm(
+          "You have unsaved changes. Are you sure you want to switch tabs?"
+        )
+      ) {
+        return;
+      }
+      setHasChanges(false);
+    }
+    setActiveTab(tabId);
+  };
+
+  const renderField = (field: SettingField) => {
+    const value = settings[field.key];
+
+    switch (field.type) {
+      case "text":
+      case "email":
+      case "number":
+        return (
+          <Input
+            type={field.type}
+            value={String(value || "")}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            placeholder={field.placeholder}
+          />
+        );
+
+      case "password":
+        return (
+          <Input
+            type="password"
+            value={String(value || "")}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            placeholder={field.placeholder}
+          />
+        );
+
+      case "textarea":
+        return (
+          <Textarea
+            value={String(value || "")}
+            onChange={(e) => handleChange(field.key, e.target.value)}
+            placeholder={field.placeholder}
+            rows={4}
+          />
+        );
+
+      case "toggle":
+        return (
           <div className="flex items-center gap-3">
-            <SettingsIcon className="h-6 w-6 text-primary" />
-            <div>
-              <CardTitle>Application Settings</CardTitle>
-              <CardDescription>
-                Configuration options for the application
-              </CardDescription>
+            <Switch
+              checked={Boolean(value)}
+              onCheckedChange={(checked) => handleChange(field.key, checked)}
+            />
+            <span className="text-sm text-muted-foreground">
+              {Boolean(value) ? "Enabled" : "Disabled"}
+            </span>
+          </div>
+        );
+
+      case "image":
+        const imageUrl = typeof value === "string" ? value : "";
+        return (
+          <div className="space-y-3">
+            {imageUrl && (
+              <div className="relative w-48 h-32 rounded-lg overflow-hidden border">
+                <Image
+                  src={imageUrl}
+                  alt={field.label}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            )}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setCurrentImageField(field.key);
+                  setMediaPickerOpen(true);
+                }}
+              >
+                {imageUrl ? "Change Image" : "Select Image"}
+              </Button>
+              {imageUrl && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => handleChange(field.key, "")}
+                >
+                  Remove
+                </Button>
+              )}
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Settings management interface coming soon. You can extend this to
-            add site-wide configuration options, API keys, email settings, and
-            more.
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const currentFields = settingsConfig.filter(
+    (field) => field.category === activeTab
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p>Loading settings...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Settings</h1>
+          <p className="text-muted-foreground">
+            Manage your application settings and configuration
           </p>
+        </div>
+        <Button onClick={handleSave} disabled={saving || !hasChanges}>
+          <Save className="mr-2 h-4 w-4" />
+          {saving ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 border-b">
+        {categories.map((category) => (
           <button
-            className="mt-4 inline-flex h-9 items-center rounded-md border px-3 text-sm hover:bg-accent"
-            onClick={() =>
-              toast({
-                title: "Saved",
-                description: "Settings saved successfully.",
-                variant: "success",
-              })
-            }
+            key={category.id}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === category.id
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => handleTabChange(category.id)}
           >
-            Fake save — show toast
+            {category.label}
           </button>
+        ))}
+      </div>
+
+      {/* Settings Form */}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {categories.find((c) => c.id === activeTab)?.label} Settings
+          </CardTitle>
+          <CardDescription>
+            Configure your{" "}
+            {categories.find((c) => c.id === activeTab)?.label.toLowerCase()}{" "}
+            settings
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {currentFields.map((field) => (
+            <div key={field.key} className="space-y-2">
+              <Label htmlFor={field.key}>{field.label}</Label>
+              {renderField(field)}
+              {field.description && (
+                <p className="text-sm text-muted-foreground">
+                  {field.description}
+                </p>
+              )}
+            </div>
+          ))}
         </CardContent>
       </Card>
+
+      {/* Media Picker */}
+      <MediaPicker
+        open={mediaPickerOpen}
+        onOpenChange={setMediaPickerOpen}
+        onSelect={handleImageSelect}
+        multiple={false}
+      />
     </div>
   );
 }
