@@ -1,0 +1,37 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - echo "MONGODB_URI=$MONGODB_URI" >> .env.production
+        - echo "JWT_ACCESS_SECRET=$JWT_ACCESS_SECRET" >> .env.production
+        - echo "JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET" >> .env.production
+        - echo "AWS_REGION=$AWS_REGION" >> .env.production
+        - echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env.production
+        - echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env.production
+        - echo "AWS_S3_BUCKET_NAME=$AWS_S3_BUCKET_NAME" >> .env.production
+        - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env.production
+        - echo "NODE_ENV=$NODE_ENV" >> .env.production
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - node_modules/**/*
+      - .next/cache/**/*
+  customHeaders:
+    - pattern: "**/*"
+      headers:
+        - key: "Strict-Transport-Security"
+          value: "max-age=31536000; includeSubDomains"
+        - key: "X-Frame-Options"
+          value: "DENY"
+        - key: "X-Content-Type-Options"
+          value: "nosniff"
+        - key: "Referrer-Policy"
+          value: "origin-when-cross-origin"
