@@ -40,10 +40,16 @@ const contentTypes = contentTypeRegistry.map((ct, index) => ({
   icon: iconMap[ct.icon] || FileText,
   color:
     index % 3 === 0
-      ? "text-primary"
+      ? "text-[hsl(var(--admin-primary))]"
       : index % 3 === 1
-      ? "text-[hsl(var(--success))]"
-      : "text-[hsl(var(--warning))]",
+      ? "text-[hsl(var(--admin-success))]"
+      : "text-[hsl(var(--admin-warning))]",
+  bgColor:
+    index % 3 === 0
+      ? "bg-[hsl(var(--admin-primary))]/10"
+      : index % 3 === 1
+      ? "bg-[hsl(var(--admin-success))]/10"
+      : "bg-[hsl(var(--admin-warning))]/10",
 }));
 
 export default function ContentTypesPage() {
@@ -69,23 +75,17 @@ export default function ContentTypesPage() {
               <CardHeader>
                 <div className="flex items-center gap-4">
                   <div
-                    className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                      contentType.color === "text-primary"
-                        ? "bg-blue-500/10"
-                        : contentType.color === "text-[hsl(var(--success))]"
-                        ? "bg-green-500/10"
-                        : "bg-orange-500/10"
-                    }`}
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center ${contentType.bgColor}`}
                   >
                     <contentType.icon
-                      className={`h-6 w-6 ${contentType.color}`}
+                      className={`h-7 w-7 ${contentType.color}`}
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="admin-text text-lg">
+                    <CardTitle className="text-[hsl(var(--admin-text-primary))] text-lg font-bold">
                       {contentType.title}
                     </CardTitle>
-                    <CardDescription className="mt-1 admin-text-muted text-sm">
+                    <CardDescription className="mt-1.5 text-[hsl(var(--admin-text-muted))] text-sm">
                       {contentType.description}
                     </CardDescription>
                   </div>

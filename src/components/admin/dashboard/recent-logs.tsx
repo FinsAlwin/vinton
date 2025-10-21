@@ -63,18 +63,21 @@ const actionColors: Record<string, string> = {
   ERROR: "text-red-500",
 };
 
-const actionBadgeClass: Record<string, string> = {
-  CREATE_CONTENT: "admin-badge-success",
-  UPDATE_CONTENT: "admin-badge-info",
-  DELETE_CONTENT: "admin-badge-danger",
-  DELETE_MEDIA: "admin-badge-danger",
-  UPLOAD_MEDIA: "bg-purple-500/10 text-purple-500",
-  UPDATE_SETTINGS: "admin-badge-warning",
-  LOGIN_SUCCESS: "admin-badge-success",
-  LOGIN_FAILED: "admin-badge-danger",
-  LOGOUT: "bg-gray-500/10 text-gray-500",
-  REGISTER_USER: "admin-badge-info",
-  ERROR: "admin-badge-danger",
+const actionBadgeVariant: Record<
+  string,
+  "success" | "warning" | "destructive" | "info" | "secondary"
+> = {
+  CREATE_CONTENT: "success",
+  UPDATE_CONTENT: "info",
+  DELETE_CONTENT: "destructive",
+  DELETE_MEDIA: "destructive",
+  UPLOAD_MEDIA: "info",
+  UPDATE_SETTINGS: "warning",
+  LOGIN_SUCCESS: "success",
+  LOGIN_FAILED: "destructive",
+  LOGOUT: "secondary",
+  REGISTER_USER: "info",
+  ERROR: "destructive",
 };
 
 function formatTimeAgo(date: Date | string): string {
@@ -101,74 +104,76 @@ function formatActionText(action: string): string {
 export function RecentLogs({ logs, className }: RecentLogsProps) {
   return (
     <Card hover="lift" className={className}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-lg admin-text flex items-center gap-2">
-          <Activity className="h-5 w-5" />
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-base font-bold admin-text flex items-center gap-2">
+          <Activity className="h-4 w-4" />
           Recent Activity
         </CardTitle>
         <Link href="/admin/logs">
-          <Button variant="outline" size="sm" className="admin-border">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs h-7 px-2 text-[hsl(var(--admin-primary))] hover:bg-[hsl(var(--admin-primary))]/10"
+          >
             View All
           </Button>
         </Link>
       </CardHeader>
       <CardContent className="p-0">
         {logs.length === 0 ? (
-          <div className="p-8 text-center">
-            <Activity className="h-12 w-12 admin-text-muted mx-auto mb-3" />
-            <p className="admin-text-muted">No recent activity</p>
+          <div className="p-6 text-center">
+            <Activity className="h-8 w-8 admin-text-muted mx-auto mb-2" />
+            <p className="text-sm admin-text-muted">No recent activity</p>
           </div>
         ) : (
           <div className="divide-y admin-border">
             {logs.map((log) => {
               const Icon = actionIcons[log.action] || Activity;
               const iconColor = actionColors[log.action] || "admin-text-muted";
-              const badgeClass =
-                actionBadgeClass[log.action] || "bg-gray-500/10 text-gray-500";
+              const badgeVariant =
+                actionBadgeVariant[log.action] || "secondary";
 
               return (
                 <div
                   key={log._id}
-                  className="flex items-start gap-3 p-4 hover:bg-gray-500/5 admin-transition"
+                  className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-[hsl(var(--admin-hover))]/50 admin-transition group"
                 >
                   <div
                     className={cn(
-                      "w-10 h-10 rounded-lg flex items-center justify-center bg-gray-500/10",
+                      "w-8 h-8 rounded-lg flex items-center justify-center bg-[hsl(var(--admin-body))] shrink-0",
                       iconColor
                     )}
                   >
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-4 w-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <Badge className={cn("text-xs", badgeClass)}>
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <Badge
+                        variant={badgeVariant}
+                        className="text-[10px] px-2 py-0"
+                      >
                         {formatActionText(log.action)}
                       </Badge>
-                      <span className="text-xs admin-text-muted">
+                      <span className="text-[10px] admin-text-muted">
                         {formatTimeAgo(log.timestamp)}
                       </span>
                     </div>
-                    <p className="text-sm admin-text">
+                    <p className="text-xs admin-text truncate">
                       <span className="font-medium">
                         {log.email || "System"}
                       </span>
-                      {" • "}
+                      <span className="admin-text-muted"> • </span>
                       <span className="admin-text-secondary capitalize">
                         {log.resource}
                       </span>
                     </p>
-                    {log.ipAddress && (
-                      <p className="text-xs admin-text-muted mt-1">
-                        IP: {log.ipAddress}
-                      </p>
-                    )}
                   </div>
                   <div
                     className={cn(
-                      "w-2 h-2 rounded-full mt-1.5",
+                      "w-1.5 h-1.5 rounded-full shrink-0",
                       log.statusCode >= 200 && log.statusCode < 300
-                        ? "bg-green-500"
-                        : "bg-red-500"
+                        ? "bg-[hsl(var(--admin-success))]"
+                        : "bg-[hsl(var(--admin-danger))]"
                     )}
                   />
                 </div>

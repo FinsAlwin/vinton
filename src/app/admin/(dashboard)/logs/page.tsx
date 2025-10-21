@@ -59,18 +59,21 @@ const actionColors: Record<string, string> = {
   ERROR: "text-red-500",
 };
 
-const actionBadgeClass: Record<string, string> = {
-  CREATE_CONTENT: "admin-badge-success",
-  UPDATE_CONTENT: "admin-badge-info",
-  DELETE_CONTENT: "admin-badge-danger",
-  DELETE_MEDIA: "admin-badge-danger",
-  UPLOAD_MEDIA: "bg-purple-500/10 text-purple-500",
-  UPDATE_SETTINGS: "admin-badge-warning",
-  LOGIN_SUCCESS: "admin-badge-success",
-  LOGIN_FAILED: "admin-badge-danger",
-  LOGOUT: "bg-gray-500/10 text-gray-500",
-  REGISTER_USER: "admin-badge-info",
-  ERROR: "admin-badge-danger",
+const actionBadgeVariant: Record<
+  string,
+  "success" | "warning" | "destructive" | "info" | "secondary"
+> = {
+  CREATE_CONTENT: "success",
+  UPDATE_CONTENT: "info",
+  DELETE_CONTENT: "destructive",
+  DELETE_MEDIA: "destructive",
+  UPLOAD_MEDIA: "info",
+  UPDATE_SETTINGS: "warning",
+  LOGIN_SUCCESS: "success",
+  LOGIN_FAILED: "destructive",
+  LOGOUT: "secondary",
+  REGISTER_USER: "info",
+  ERROR: "destructive",
 };
 
 function formatActionText(action: string): string {
@@ -236,14 +239,13 @@ export default function LogsPage() {
                   const Icon = actionIcons[log.action] || Activity;
                   const iconColor =
                     actionColors[log.action] || "admin-text-muted";
-                  const badgeClass =
-                    actionBadgeClass[log.action] ||
-                    "bg-gray-500/10 text-gray-500";
+                  const badgeVariant =
+                    actionBadgeVariant[log.action] || "secondary";
 
                   return (
                     <tr
                       key={log._id}
-                      className="hover:bg-gray-500/5 admin-transition"
+                      className="hover:bg-[hsl(var(--admin-hover))]/50 admin-transition"
                     >
                       <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                         <div className="text-sm admin-text">
@@ -261,7 +263,7 @@ export default function LogsPage() {
                       <td className="px-4 sm:px-6 py-4">
                         <div className="flex items-center gap-2">
                           <Icon className={cn("h-4 w-4", iconColor)} />
-                          <Badge className={cn("text-xs", badgeClass)}>
+                          <Badge variant={badgeVariant}>
                             {formatActionText(log.action)}
                           </Badge>
                         </div>
@@ -278,10 +280,10 @@ export default function LogsPage() {
                       </td>
                       <td className="px-4 sm:px-6 py-4">
                         <Badge
-                          className={
+                          variant={
                             log.statusCode >= 200 && log.statusCode < 300
-                              ? "admin-badge-success"
-                              : "admin-badge-danger"
+                              ? "success"
+                              : "destructive"
                           }
                         >
                           {log.statusCode}
@@ -355,9 +357,8 @@ export default function LogsPage() {
                 <div>
                   <p className="text-xs admin-text-muted mb-1">Action</p>
                   <Badge
-                    className={
-                      actionBadgeClass[selectedLog.action] ||
-                      "bg-gray-500/10 text-gray-500"
+                    variant={
+                      actionBadgeVariant[selectedLog.action] || "secondary"
                     }
                   >
                     {formatActionText(selectedLog.action)}
@@ -378,11 +379,11 @@ export default function LogsPage() {
                 <div>
                   <p className="text-xs admin-text-muted mb-1">Status Code</p>
                   <Badge
-                    className={
+                    variant={
                       selectedLog.statusCode >= 200 &&
                       selectedLog.statusCode < 300
-                        ? "admin-badge-success"
-                        : "admin-badge-danger"
+                        ? "success"
+                        : "destructive"
                     }
                   >
                     {selectedLog.statusCode}

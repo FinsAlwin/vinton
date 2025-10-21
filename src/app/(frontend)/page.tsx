@@ -1,39 +1,37 @@
 import { getSettings, getSettingValue } from "@/lib/settings";
-import Image from "next/image";
+import Navigation from "@/components/frontend/navigation";
+import HeroSection from "@/components/frontend/hero-section";
+import FeaturesGrid from "@/components/frontend/features-grid";
+import ServicesSection from "@/components/frontend/services-section";
+import ProjectsShowcase from "@/components/frontend/projects-showcase";
+import TeamSection from "@/components/frontend/team-section";
+import Testimonials from "@/components/frontend/testimonials";
+import CTASection from "@/components/frontend/cta-section";
 import Footer from "@/components/frontend/footer";
 import MaintenanceWrapper from "@/components/frontend/maintenance-wrapper";
+
+export const metadata = {
+  title: "Vinton - Build Something Amazing",
+  description:
+    "We create innovative solutions that help your business grow and succeed in the digital world.",
+};
 
 export default async function HomePage() {
   const settings = await getSettings();
   const siteName = getSettingValue<string>(settings, "site_name", "Vinton");
-  const siteTagline = getSettingValue<string>(
-    settings,
-    "site_tagline",
-    "Coming Soon"
-  );
   const siteLogo = getSettingValue<string>(settings, "site_logo");
 
   return (
     <MaintenanceWrapper>
-      <div className="min-h-screen w-full bg-background flex flex-col">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="text-foreground text-center max-w-2xl">
-            {siteLogo && (
-              <div className="mb-8 flex justify-center">
-                <div className="relative w-32 h-32">
-                  <Image
-                    src={siteLogo}
-                    alt={siteName}
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-            )}
-            <h1 className="text-5xl font-bold mb-4">{siteName}</h1>
-            <p className="text-xl text-muted-foreground">{siteTagline}</p>
-          </div>
-        </div>
+      <div className="min-h-screen bg-white">
+        <Navigation siteName={siteName} siteLogo={siteLogo} />
+        <HeroSection />
+        <FeaturesGrid />
+        <ServicesSection />
+        <ProjectsShowcase />
+        <TeamSection />
+        <Testimonials />
+        <CTASection />
         <Footer />
       </div>
     </MaintenanceWrapper>

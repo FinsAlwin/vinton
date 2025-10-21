@@ -1,9 +1,16 @@
 @import "tailwindcss";
 
-/* Global styles for frontend */
+/* Global styles for frontend only */
 /* Admin panel has separate styles in admin/admin.css */
 
 @layer base {
+  :root {
+    --frontend-primary: 59 130 246; /* blue-500 */
+    --frontend-accent: 16 185 129; /* emerald-500 */
+    --frontend-dark: 15 23 42; /* slate-900 */
+    --frontend-light: 248 250 252; /* slate-50 */
+  }
+  
   * {
     @apply border-gray-200;
   }
@@ -13,9 +20,23 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
-  /* Frontend will use these when ready */
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24;
+  }
+  
+  .gradient-hero {
+    background: linear-gradient(135deg, rgb(var(--frontend-primary)) 0%, rgb(var(--frontend-accent)) 100%);
+  }
+  
+  .gradient-cta {
+    background: linear-gradient(90deg, rgb(var(--frontend-primary)) 0%, rgb(var(--frontend-accent)) 100%);
   }
 }

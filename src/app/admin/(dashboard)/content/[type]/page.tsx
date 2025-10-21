@@ -2,6 +2,7 @@
 
 import { useState, use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useContent } from "@/hooks/useSWR";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
@@ -15,9 +16,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/admin/ui/dropdown-menu";
-import { Plus, Search, MoreVertical, Trash2, Edit } from "lucide-react";
+import {
+  Plus,
+  Search,
+  MoreVertical,
+  Trash2,
+  Edit,
+  FileText,
+  LayoutGrid,
+  List,
+} from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+
+type ViewMode = "list" | "grid";
 
 export default function ContentListPage({
   params,
@@ -29,6 +41,7 @@ export default function ContentListPage({
   const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [statusFilter, setStatusFilter] = useState<"" | "draft" | "published">(
     ""
   );
@@ -139,6 +152,34 @@ export default function ContentListPage({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* View Mode Toggle */}
+          <div className="flex gap-1 p-1 bg-[hsl(var(--admin-body))] border border-[hsl(var(--admin-border))] rounded-lg">
+            <Button
+              variant={viewMode === "list" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className={
+                viewMode === "list"
+                  ? "bg-[hsl(var(--admin-primary))] text-white hover:bg-[hsl(var(--admin-primary-hover))]"
+                  : "text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text-primary))] hover:bg-[hsl(var(--admin-hover))]"
+              }
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              className={
+                viewMode === "grid"
+                  ? "bg-[hsl(var(--admin-primary))] text-white hover:bg-[hsl(var(--admin-primary-hover))]"
+                  : "text-[hsl(var(--admin-text-muted))] hover:text-[hsl(var(--admin-text-primary))] hover:bg-[hsl(var(--admin-hover))]"
+              }
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </Card>
 
@@ -154,7 +195,7 @@ export default function ContentListPage({
             <Button>Create Your First {capitalizeType}</Button>
           </Link>
         </Card>
-      ) : (
+      ) : viewMode === "list" ? (
         <Card hover="lift">
           <div className="divide-y admin-border">
             {content.map(
@@ -165,80 +206,206 @@ export default function ContentListPage({
                 status: "draft" | "published";
                 createdAt: string | Date;
                 updatedAt: string | Date;
+                metadata?: {
+                  featuredImage?: string;
+                };
               }) => (
                 <div
                   key={item._id}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 hover:bg-gray-500/5 admin-transition gap-4"
+                  className="flex items-center gap-4 p-4 sm:p-6 hover:bg-[hsl(var(--admin-hover))]/50 admin-transition"
                 >
+                  {/* Featured Image */}
+                  <div className="shrink-0">
+                    {item.metadata?.featuredImage ? (
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border-2 border-[hsl(var(--admin-border))] bg-[hsl(var(--admin-body))]">
+                        <Image
+                          src={item.metadata.featuredImage}
+                          alt={item.title}
+                          width={96}
+                          height={96}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg border-2 border-dashed border-[hsl(var(--admin-border))] bg-[hsl(var(--admin-body))] flex items-center justify-center">
+                        <FileText className="h-8 w-8 text-[hsl(var(--admin-text-muted))]" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <h3 className="font-semibold admin-text truncate">
+                    <div className="flex items-center gap-3 flex-wrap mb-2">
+                      <h3 className="font-semibold text-[hsl(var(--admin-text-primary))] text-base">
                         {item.title}
                       </h3>
                       <Badge
                         variant={
                           item.status === "published" ? "success" : "warning"
                         }
-                        className={
-                          item.status === "published"
-                            ? "admin-badge-success"
-                            : "admin-badge-warning"
-                        }
                       >
                         {item.status}
                       </Badge>
                     </div>
-                    <p className="text-sm admin-text-secondary mt-2">
+                    <p className="text-sm text-[hsl(var(--admin-text-secondary))] line-clamp-2 mb-2">
                       {item.description || "No description"}
                     </p>
-                    <p className="text-xs admin-text-muted mt-2">
+                    <p className="text-xs text-[hsl(var(--admin-text-muted))]">
                       Created {formatDate(item.createdAt)} • Updated{" "}
                       {formatDate(item.updatedAt)}
                     </p>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="admin-text-secondary"
+
+                  {/* Actions */}
+                  <div className="shrink-0">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-[hsl(var(--admin-text-secondary))] hover:bg-[hsl(var(--admin-hover))] hover:text-[hsl(var(--admin-text-primary))]"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="admin-card admin-border"
                       >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="admin-card admin-border"
-                    >
-                      <DropdownMenuItem
-                        onClick={() =>
-                          router.push(`/admin/content/${type}/edit/${item._id}`)
-                        }
-                        className="admin-text"
-                      >
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          setDeleteDialog({
-                            open: true,
-                            id: item._id,
-                            title: item.title,
-                          })
-                        }
-                        className="text-red-500 hover:bg-red-500/10"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            router.push(
+                              `/admin/content/${type}/edit/${item._id}`
+                            )
+                          }
+                          className="admin-text hover:bg-[hsl(var(--admin-hover))] cursor-pointer"
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            setDeleteDialog({
+                              open: true,
+                              id: item._id,
+                              title: item.title,
+                            })
+                          }
+                          className="text-[hsl(var(--admin-danger))] hover:bg-[hsl(var(--admin-danger))]/10 cursor-pointer"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               )
             )}
           </div>
         </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {content.map(
+            (item: {
+              _id: string;
+              title: string;
+              description?: string;
+              status: "draft" | "published";
+              createdAt: string | Date;
+              updatedAt: string | Date;
+              metadata?: {
+                featuredImage?: string;
+              };
+            }) => (
+              <Card
+                key={item._id}
+                hover="lift"
+                className="overflow-hidden flex flex-col"
+              >
+                {/* Featured Image */}
+                <div className="relative aspect-video bg-[hsl(var(--admin-body))]">
+                  {item.metadata?.featuredImage ? (
+                    <Image
+                      src={item.metadata.featuredImage}
+                      alt={item.title}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center border-b-2 border-dashed border-[hsl(var(--admin-border))]">
+                      <FileText className="h-16 w-16 text-[hsl(var(--admin-text-muted))]" />
+                    </div>
+                  )}
+                  <div className="absolute top-3 right-3">
+                    <Badge
+                      variant={
+                        item.status === "published" ? "success" : "warning"
+                      }
+                    >
+                      {item.status}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Card Content */}
+                <div className="p-5 flex-1 flex flex-col">
+                  <h3 className="font-bold text-[hsl(var(--admin-text-primary))] text-lg mb-2 line-clamp-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-[hsl(var(--admin-text-secondary))] line-clamp-3 mb-4 flex-1">
+                    {item.description || "No description"}
+                  </p>
+                  <div className="flex items-center justify-between pt-3 border-t border-[hsl(var(--admin-border))]">
+                    <p className="text-xs text-[hsl(var(--admin-text-muted))]">
+                      {formatDate(item.updatedAt)}
+                    </p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-[hsl(var(--admin-text-secondary))] hover:bg-[hsl(var(--admin-hover))] hover:text-[hsl(var(--admin-text-primary))] h-8"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="admin-card admin-border"
+                      >
+                        <DropdownMenuItem
+                          onClick={() =>
+                            router.push(
+                              `/admin/content/${type}/edit/${item._id}`
+                            )
+                          }
+                          className="admin-text hover:bg-[hsl(var(--admin-hover))] cursor-pointer"
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            setDeleteDialog({
+                              open: true,
+                              id: item._id,
+                              title: item.title,
+                            })
+                          }
+                          className="text-[hsl(var(--admin-danger))] hover:bg-[hsl(var(--admin-danger))]/10 cursor-pointer"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              </Card>
+            )
+          )}
+        </div>
       )}
 
       {/* Pagination */}

@@ -64,22 +64,26 @@ export function ToasterProvider({ children }: { children: React.ReactNode }) {
 }
 
 const variantClasses: Record<ToastVariant, string> = {
-  default: "border bg-background text-foreground",
-  destructive: "border-destructive/50 text-destructive bg-destructive/10",
+  default:
+    "border-[hsl(var(--admin-border))] bg-[hsl(var(--admin-card))] text-[hsl(var(--admin-text-primary))]",
+  destructive:
+    "border-[hsl(var(--admin-danger))]/50 text-[hsl(var(--admin-danger))] bg-[hsl(var(--admin-danger))]/10",
   success:
-    "border-[hsl(var(--success))] text-[hsl(var(--success-foreground))] bg-[hsl(var(--success))]/10",
+    "border-[hsl(var(--admin-success))]/50 text-[hsl(var(--admin-success))] bg-[hsl(var(--admin-success))]/10",
   warning:
-    "border-[hsl(var(--warning))] text-[hsl(var(--warning-foreground))] bg-[hsl(var(--warning))]/10",
-  info: "border-primary text-primary-foreground bg-primary/10",
+    "border-[hsl(var(--admin-warning))]/50 text-[hsl(var(--admin-warning))] bg-[hsl(var(--admin-warning))]/10",
+  info: "border-[hsl(var(--admin-info))]/50 text-[hsl(var(--admin-info))] bg-[hsl(var(--admin-info))]/10",
 };
 
 function ToastItem({ toast }: { toast: Toast }) {
   const { dismiss } = useToastContext();
+  const variant = toast.variant ?? "default";
+
   return (
     <div
       className={cn(
-        "pointer-events-auto w-full max-w-sm overflow-hidden rounded-md border p-4 shadow-lg ring-1 ring-black/5",
-        variantClasses[toast.variant ?? "default"]
+        "pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg border-2 p-4 shadow-xl backdrop-blur-sm animate-in slide-in-from-right-full",
+        variantClasses[variant]
       )}
       role="status"
       aria-live="polite"
@@ -87,24 +91,34 @@ function ToastItem({ toast }: { toast: Toast }) {
       <div className="flex items-start gap-3">
         <div className="flex-1">
           {toast.title ? (
-            <div className="text-sm font-medium leading-none">
+            <div className="text-sm font-semibold leading-none mb-1">
               {toast.title}
             </div>
           ) : null}
           {toast.description ? (
-            <div className="mt-1 text-sm text-muted-foreground">
-              {toast.description}
-            </div>
+            <div className="mt-1 text-sm opacity-90">{toast.description}</div>
           ) : null}
         </div>
         {toast.action}
         <button
           type="button"
-          className="ml-2 inline-flex rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="ml-2 inline-flex rounded-md p-1.5 opacity-70 hover:opacity-100 hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--admin-primary))] transition-all"
           aria-label="Dismiss"
           onClick={() => dismiss(toast.id)}
         >
-          ×
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
         </button>
       </div>
     </div>

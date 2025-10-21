@@ -3,17 +3,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const alertVariants = cva(
-  "relative w-full rounded-lg border p-4 text-sm [&>svg~div]:translate-y-[-1px] [&>svg+div]:mt-0 [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:mr-3 flex items-start",
+  "relative w-full rounded-lg border-2 p-4 text-sm [&>svg~div]:translate-y-[-1px] [&>svg+div]:mt-0 [&>svg]:size-5 [&>svg]:shrink-0 [&>svg]:mr-3 flex items-start shadow-sm",
   {
     variants: {
       variant: {
-        default: "bg-background text-foreground",
-        info: "border-primary text-primary-foreground bg-primary/10",
+        default:
+          "bg-[hsl(var(--admin-card))] border-[hsl(var(--admin-border))] text-[hsl(var(--admin-text-primary))]",
+        info: "border-[hsl(var(--admin-info))]/50 text-[hsl(var(--admin-info))] bg-[hsl(var(--admin-info))]/10 [&>svg]:text-[hsl(var(--admin-info))]",
         success:
-          "border-[hsl(var(--success))] text-[hsl(var(--success-foreground))] bg-[hsl(var(--success))]/10",
+          "border-[hsl(var(--admin-success))]/50 text-[hsl(var(--admin-success))] bg-[hsl(var(--admin-success))]/10 [&>svg]:text-[hsl(var(--admin-success))]",
         warning:
-          "border-[hsl(var(--warning))] text-[hsl(var(--warning-foreground))] bg-[hsl(var(--warning))]/10",
-        destructive: "border-destructive/50 text-destructive bg-destructive/10",
+          "border-[hsl(var(--admin-warning))]/50 text-[hsl(var(--admin-warning))] bg-[hsl(var(--admin-warning))]/10 [&>svg]:text-[hsl(var(--admin-warning))]",
+        destructive:
+          "border-[hsl(var(--admin-danger))]/50 text-[hsl(var(--admin-danger))] bg-[hsl(var(--admin-danger))]/10 [&>svg]:text-[hsl(var(--admin-danger))]",
       },
     },
     defaultVariants: {
@@ -44,7 +46,7 @@ const AlertTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h5
     ref={ref}
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    className={cn("mb-1 font-semibold leading-none tracking-tight", className)}
     {...props}
   />
 ));
@@ -56,7 +58,7 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-sm opacity-90 leading-relaxed", className)}
     {...props}
   />
 ));
