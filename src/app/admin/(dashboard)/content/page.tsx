@@ -9,55 +9,42 @@ import {
   FileText,
   Image as ImageIcon,
   Users,
-  Newspaper,
   Briefcase,
   Wrench,
+  FolderOpen,
+  Building,
+  MessageSquare,
+  Home,
 } from "lucide-react";
+import { getNavContentTypes } from "@/lib/content-types";
 
-const contentTypes = [
-  {
-    type: "blogs",
-    title: "Blogs",
-    description: "Manage blog posts and articles",
-    icon: FileText,
-    color: "text-primary",
-  },
-  {
-    type: "news",
-    title: "News",
-    description: "Company news and updates",
-    icon: Newspaper,
-    color: "text-[hsl(var(--success))]",
-  },
-  {
-    type: "portfolio",
-    title: "Portfolio",
-    description: "Project showcase and case studies",
-    icon: ImageIcon,
-    color: "text-primary",
-  },
-  {
-    type: "team",
-    title: "Team Members",
-    description: "Team profiles and information",
-    icon: Users,
-    color: "text-[hsl(var(--warning))]",
-  },
-  {
-    type: "services",
-    title: "Services",
-    description: "Service offerings and details",
-    icon: Wrench,
-    color: "text-primary",
-  },
-  {
-    type: "company",
-    title: "Company Info",
-    description: "About and company information",
-    icon: Briefcase,
-    color: "text-primary",
-  },
-];
+// Map icon names to lucide-react components
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Home: Home,
+  Briefcase: Briefcase,
+  Wrench: Wrench,
+  Users: Users,
+  FolderOpen: FolderOpen,
+  Building: Building,
+  MessageSquare: MessageSquare,
+  FileText: FileText,
+  Image: ImageIcon,
+};
+
+const contentTypeRegistry = getNavContentTypes();
+
+const contentTypes = contentTypeRegistry.map((ct, index) => ({
+  type: ct.name,
+  title: ct.label,
+  description: ct.description,
+  icon: iconMap[ct.icon] || FileText,
+  color:
+    index % 3 === 0
+      ? "text-primary"
+      : index % 3 === 1
+      ? "text-[hsl(var(--success))]"
+      : "text-[hsl(var(--warning))]",
+}));
 
 export default function ContentTypesPage() {
   return (
