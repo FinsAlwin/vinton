@@ -112,16 +112,16 @@ export default function MediaLibraryPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Media Library</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold admin-text mb-2">Media Library</h1>
+          <p className="admin-text-secondary">
             Manage your uploaded files and images
           </p>
         </div>
         <label htmlFor="file-upload">
-          <Button disabled={uploading} asChild>
+          <Button disabled={uploading} asChild className="w-full sm:w-auto">
             <span className="cursor-pointer">
               <Upload className="mr-2 h-4 w-4" />
               {uploading ? "Uploading..." : "Upload File"}
@@ -138,46 +138,52 @@ export default function MediaLibraryPage() {
       </div>
 
       {/* Search and View Controls */}
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search media..."
-            className="pl-9"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-          />
+      <Card className="p-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 admin-text-muted" />
+            <Input
+              placeholder="Search media..."
+              className="pl-9 admin-card admin-border admin-text"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === "grid" ? "default" : "outline"}
+              size="icon"
+              onClick={() => setViewMode("grid")}
+              className={viewMode === "grid" ? "" : "admin-border"}
+            >
+              <Grid3x3 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "default" : "outline"}
+              size="icon"
+              onClick={() => setViewMode("list")}
+              className={viewMode === "list" ? "" : "admin-border"}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant={viewMode === "grid" ? "default" : "outline"}
-            size="icon"
-            onClick={() => setViewMode("grid")}
-          >
-            <Grid3x3 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={viewMode === "list" ? "default" : "outline"}
-            size="icon"
-            onClick={() => setViewMode("list")}
-          >
-            <List className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      </Card>
 
       {/* Media Grid/List */}
       {isLoading ? (
-        <div className="text-center py-12">Loading...</div>
+        <Card className="p-12">
+          <div className="text-center admin-text-secondary">Loading...</div>
+        </Card>
       ) : media.length === 0 ? (
-        <Card className="p-12 text-center">
-          <p className="text-muted-foreground">No media files yet</p>
+        <Card hover="lift" className="p-12 text-center">
+          <p className="admin-text-muted">No media files yet</p>
         </Card>
       ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {media.map(
             (item: {
               _id: string;
@@ -187,8 +193,8 @@ export default function MediaLibraryPage() {
               size: number;
               createdAt: string | Date;
             }) => (
-              <Card key={item._id} className="overflow-hidden">
-                <div className="aspect-square relative bg-muted">
+              <Card key={item._id} hover="lift" className="overflow-hidden">
+                <div className="aspect-square relative bg-gray-500/10">
                   {item.mimeType.startsWith("image/") ? (
                     <Image
                       src={item.url}
@@ -198,27 +204,27 @@ export default function MediaLibraryPage() {
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm font-medium admin-text-muted">
                         {item.mimeType.split("/")[1].toUpperCase()}
                       </span>
                     </div>
                   )}
                 </div>
-                <div className="p-3 space-y-2">
+                <div className="p-4 space-y-3">
                   <p
-                    className="text-sm font-medium truncate"
+                    className="text-sm font-medium admin-text truncate"
                     title={item.originalName}
                   >
                     {item.originalName}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs admin-text-muted">
                     {(item.size / 1024).toFixed(1)} KB
                   </p>
                   <div className="flex gap-2">
                     <Button
                       size="sm"
                       variant="outline"
-                      className="flex-1"
+                      className="flex-1 admin-border"
                       onClick={() => copyUrl(item.url)}
                     >
                       <Copy className="h-3 w-3 mr-1" />
@@ -240,8 +246,8 @@ export default function MediaLibraryPage() {
           )}
         </div>
       ) : (
-        <Card>
-          <div className="divide-y">
+        <Card hover="lift">
+          <div className="divide-y admin-border">
             {media.map(
               (item: {
                 _id: string;
@@ -254,9 +260,9 @@ export default function MediaLibraryPage() {
               }) => (
                 <div
                   key={item._id}
-                  className="flex items-center gap-4 p-4 hover:bg-muted/50"
+                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 sm:p-6 hover:bg-gray-500/5 admin-transition"
                 >
-                  <div className="w-16 h-16 relative bg-muted rounded overflow-hidden shrink-0">
+                  <div className="w-16 h-16 relative bg-gray-500/10 rounded-lg overflow-hidden shrink-0">
                     {item.mimeType.startsWith("image/") ? (
                       <Image
                         src={item.url}
@@ -266,24 +272,27 @@ export default function MediaLibraryPage() {
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full">
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs font-medium admin-text-muted">
                           {item.mimeType.split("/")[1].toUpperCase()}
                         </span>
                       </div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{item.originalName}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium admin-text truncate">
+                      {item.originalName}
+                    </p>
+                    <p className="text-sm admin-text-secondary mt-1">
                       {(item.size / 1024).toFixed(1)} KB •{" "}
                       {formatDate(item.createdAt)}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 w-full sm:w-auto">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => copyUrl(item.url)}
+                      className="flex-1 sm:flex-initial admin-border"
                     >
                       <Copy className="h-4 w-4 mr-2" />
                       Copy URL
@@ -312,16 +321,18 @@ export default function MediaLibraryPage() {
             variant="outline"
             disabled={page === 1}
             onClick={() => setPage(page - 1)}
+            className="admin-border"
           >
             Previous
           </Button>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm admin-text-muted">
             Page {page} of {pagination.totalPages}
           </span>
           <Button
             variant="outline"
             disabled={page === pagination.totalPages}
             onClick={() => setPage(page + 1)}
+            className="admin-border"
           >
             Next
           </Button>

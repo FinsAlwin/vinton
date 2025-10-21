@@ -7,6 +7,7 @@ import {
   verifyAccessToken,
 } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
+import { logContentChange } from "@/lib/logger";
 import type { ApiResponse } from "@/types";
 
 // GET - List content by type
@@ -165,6 +166,21 @@ export async function POST(
       },
       media: media || [],
     });
+
+    // Log content creation
+    await logContentChange(
+      request,
+      "CREATE_CONTENT",
+      { userId: currentUser.userId, email: currentUser.email },
+      content._id.toString(),
+      type,
+      title,
+      201,
+      {
+        slug,
+        status: content.status,
+      }
+    );
 
     return NextResponse.json<ApiResponse>(
       {

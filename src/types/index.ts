@@ -91,3 +91,31 @@ export interface ContentFilters extends PaginationParams {
   status?: "draft" | "published";
   author?: string;
 }
+
+export interface ActivityLog {
+  _id: string;
+  user?: {
+    _id: string;
+    email: string;
+  };
+  email?: string;
+  action: string;
+  resource: string;
+  resourceId?: string;
+  method: string;
+  path: string;
+  statusCode: number;
+  ipAddress?: string;
+  userAgent?: string;
+  details?: Record<string, unknown>;
+  duration?: number;
+  timestamp: Date;
+}
+
+export interface LogFilters extends PaginationParams {
+  action?: string;
+  resource?: string;
+  userId?: string;
+  startDate?: string;
+  endDate?: string;
+}

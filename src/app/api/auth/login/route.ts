@@ -7,6 +7,7 @@ import {
   generateRefreshToken,
   setAuthCookies,
 } from "@/lib/auth";
+import { logAuthEvent } from "@/lib/logger";
 import type { ApiResponse } from "@/types";
 
 export async function POST(request: NextRequest) {
@@ -27,6 +28,11 @@ export async function POST(request: NextRequest) {
 
     const user = await User.findOne({ email });
     if (!user) {
+      // Log failed login attempt
+      await logAuthEvent(request, "LOGIN_FAILED", email, {
+        reason: "User not found",
+      });
+
       return NextResponse.json<ApiResponse>(
         {
           success: false,
@@ -38,6 +44,11 @@ export async function POST(request: NextRequest) {
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      // Log failed login attempt
+      await logAuthEvent(request, "LOGIN_FAILED", email, {
+        reason: "Invalid password",
+      });
+
       return NextResponse.json<ApiResponse>(
         {
           success: false,
@@ -63,6 +74,11 @@ export async function POST(request: NextRequest) {
 
     // Set cookies
     await setAuthCookies(accessToken, refreshToken);
+
+    // Log successful login
+    await logAuthEvent(request, "LOGIN_SUCCESS", user.email, {
+      role: user.role,
+    });
 
     return NextResponse.json<ApiResponse>(
       {

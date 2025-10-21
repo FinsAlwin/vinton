@@ -15,7 +15,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen admin-body-bg admin-transition">
       <ClientSidebar />
       <div className="flex flex-1 flex-col lg:pl-64 transition-all duration-300">
         <ClientHeader
@@ -24,7 +24,9 @@ export default async function DashboardLayout({
             role: currentUser.role,
           }}
         />
-        <main className="flex-1 p-4 sm:p-6 overflow-auto">{children}</main>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto admin-scrollbar">
+          {children}
+        </main>
       </div>
     </div>
   );

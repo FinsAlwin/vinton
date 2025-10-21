@@ -1,45 +1,21 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 95%;
-    --card: 224 71% 6%;
-    --card-foreground: 213 31% 95%;
-    --popover: 224 71% 6%;
-    --popover-foreground: 213 31% 95%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 217.2 91.2% 50%;
-    --secondary: 222.2 47.4% 14%;
-    --secondary-foreground: 210 40% 98%;
-    --secondary-hover: 222.2 47.4% 18%;
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 70%;
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
-    --accent-hover: 216 34% 22%;
-    --destructive: 0 62.8% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --destructive-hover: 0 62.8% 40%;
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
-    --ring: 217.2 91.2% 59.8%;
-    --radius: 0.5rem;
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-  }
-}
+/* Global styles for frontend */
+/* Admin panel has separate styles in admin/admin.css */
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    @apply border-gray-200;
   }
+  
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    @apply bg-white text-gray-900 antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Frontend will use these when ready */
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }

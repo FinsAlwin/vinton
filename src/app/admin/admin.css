@@ -1,0 +1,448 @@
+/* TailAdmin-inspired Admin Panel Styles */
+
+@layer base {
+  /* Default to dark theme */
+  :root,
+  [data-theme="dark"] {
+    /* Backgrounds */
+    --admin-body: 222 47% 11%; /* #1C2434 equivalent in HSL */
+    --admin-sidebar: 222 47% 11%; /* Darker sidebar */
+    --admin-card: 222 50% 14%; ; /* #313D4A equivalent */
+    --admin-hover: 215 25% 20%; /* Hover state */
+    
+    /* Primary Colors */
+    --admin-primary: 231 76% 57%; /* #3C50E0 - TailAdmin blue */
+    --admin-primary-hover: 231 76% 50%;
+    --admin-primary-light: 231 76% 95%;
+    
+    /* Text Colors */
+    --admin-text-primary: 0 0% 100%;
+    --admin-text-secondary: 215 20% 65%;
+    --admin-text-muted: 215 15% 50%;
+    
+    /* Border Colors */
+    --admin-border: 215 25% 27%;
+    --admin-border-light: 215 25% 22%;
+    
+    /* Status Colors */
+    --admin-success: 142 76% 36%;
+    --admin-success-light: 142 76% 95%;
+    --admin-warning: 38 92% 50%;
+    --admin-warning-light: 38 92% 95%;
+    --admin-danger: 0 72% 51%;
+    --admin-danger-light: 0 72% 95%;
+    --admin-info: 199 89% 48%;
+    --admin-info-light: 199 89% 95%;
+    
+    /* Old theme compatibility - map to admin colors */
+    --background: 222 47% 11%;
+    --foreground: 0 0% 100%;
+    --card: 215 25% 17%;
+    --card-foreground: 0 0% 100%;
+    --primary: 231 76% 57%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 231 76% 50%;
+    --secondary: 215 25% 20%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 215 15% 50%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 215 25% 20%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 215 25% 27%;
+    --input: 215 25% 27%;
+    --ring: 231 76% 57%;
+  }
+  
+  /* Light theme */
+  [data-theme="light"] {
+    /* Backgrounds */
+    --admin-body: 210 20% 98%; /* #F8FAFC */
+    --admin-sidebar: 0 0% 100%; /* White */
+    --admin-card: 0 0% 100%; /* White */
+    --admin-hover: 210 40% 96%; /* Light gray hover */
+    
+    /* Primary Colors */
+    --admin-primary: 231 76% 57%; /* Same blue */
+    --admin-primary-hover: 231 76% 50%;
+    --admin-primary-light: 231 76% 95%;
+    
+    /* Text Colors */
+    --admin-text-primary: 215 25% 17%;
+    --admin-text-secondary: 215 20% 35%;
+    --admin-text-muted: 215 15% 50%;
+    
+    /* Border Colors */
+    --admin-border: 214 32% 91%;
+    --admin-border-light: 214 32% 95%;
+    
+    /* Status Colors - same as dark */
+    --admin-success: 142 76% 36%;
+    --admin-success-light: 142 76% 95%;
+    --admin-warning: 38 92% 50%;
+    --admin-warning-light: 38 92% 95%;
+    --admin-danger: 0 72% 51%;
+    --admin-danger-light: 0 72% 95%;
+    --admin-info: 199 89% 48%;
+    --admin-info-light: 199 89% 95%;
+    
+    /* Old theme compatibility - map to admin colors */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 17%;
+    --primary: 231 76% 57%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 231 76% 50%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 215 25% 17%;
+    --muted: 215 15% 50%;
+    --muted-foreground: 215 20% 35%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 215 25% 17%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 231 76% 57%;
+  }
+}
+
+/* Admin-specific utility classes */
+@layer utilities {
+  .admin-body-bg {
+    background-color: hsl(var(--admin-body));
+  }
+  
+  .admin-sidebar-bg {
+    background-color: hsl(var(--admin-sidebar));
+  }
+  
+  /* Light mode sidebar - white background with shadow */
+  [data-theme="light"] .admin-sidebar-bg {
+    background-color: #FFFFFF;
+    box-shadow: 1px 0 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .admin-card-bg {
+    background-color: hsl(var(--admin-card));
+  }
+  
+  .admin-text {
+    color: hsl(var(--admin-text-primary));
+  }
+  
+  .admin-text-secondary {
+    color: hsl(var(--admin-text-secondary));
+  }
+  
+  .admin-text-muted {
+    color: hsl(var(--admin-text-muted));
+  }
+  
+  .admin-border {
+    border-color: hsl(var(--admin-border));
+  }
+  
+  /* Light mode - lighter borders */
+  [data-theme="light"] .admin-border {
+    border-color: #E5E7EB;
+  }
+  
+  .admin-primary-bg {
+    background-color: hsl(var(--admin-primary));
+  }
+  
+  .admin-primary-text {
+    color: hsl(var(--admin-primary));
+  }
+  
+  /* Card with TailAdmin styling */
+  .admin-card {
+    background-color: hsl(var(--admin-card));
+    border: 1px solid hsl(var(--admin-border));
+    border-radius: 1rem; /* 10px - TailAdmin uses slightly larger radius */
+    transition: all 0.3s ease;
+  }
+  
+  /* Dark mode cards - subtle shadow */
+  [data-theme="dark"] .admin-card,
+  :root .admin-card {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.2);
+  }
+  
+  /* Light mode cards - more prominent shadow */
+  [data-theme="light"] .admin-card {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+  
+  .admin-card-hover:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Dark mode hover shadow */
+  [data-theme="dark"] .admin-card-hover:hover,
+  :root .admin-card-hover:hover {
+    box-shadow: 0 10px 20px -5px rgb(0 0 0 / 0.3), 0 4px 8px -4px rgb(0 0 0 / 0.2);
+  }
+  
+  /* Light mode hover shadow */
+  [data-theme="light"] .admin-card-hover:hover {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+  
+  .admin-card-elevated {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  
+  /* Sidebar link styles - TailAdmin inspired */
+  .admin-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  
+  /* Dark mode sidebar links - DEFAULT */
+  .admin-sidebar-link {
+    color: #8A99AF !important; /* TailAdmin sidebar text color - lighter gray-blue */
+  }
+  
+  .admin-sidebar-link:hover {
+    background-color: rgba(88, 103, 221, 0.08) !important;
+    color: #DEE4EE !important; /* Lighter text on hover */
+  }
+  
+  .admin-sidebar-link-active {
+    background-color: rgba(88, 103, 221, 0.1) !important;
+    color: #3C50E0 !important; /* TailAdmin blue - active bluish color */
+  }
+  
+  /* Active indicator - left border */
+  .admin-sidebar-link-active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: #3C50E0;
+    border-radius: 0 3px 3px 0;
+  }
+  
+  /* Light mode sidebar links */
+  [data-theme="light"] .admin-sidebar-link {
+    color: #64748B !important; /* Darker slate gray for light mode */
+  }
+  
+  [data-theme="light"] .admin-sidebar-link:hover {
+    background-color: rgba(88, 103, 221, 0.08) !important;
+    color: #1E293B !important; /* Even darker text on hover */
+  }
+  
+  [data-theme="light"] .admin-sidebar-link-active {
+    background-color: rgba(88, 103, 221, 0.1) !important;
+    color: #3C50E0 !important; /* Same bluish color when active */
+  }
+  
+  /* Ensure icons inherit link color */
+  .admin-sidebar-link svg {
+    color: currentColor !important;
+  }
+  
+  /* Ensure span text inherits color */
+  .admin-sidebar-link span {
+    color: inherit !important;
+  }
+  
+  /* Status badges */
+  .admin-badge-success {
+    background-color: hsl(var(--admin-success-light));
+    color: hsl(var(--admin-success));
+  }
+  
+  .admin-badge-warning {
+    background-color: hsl(var(--admin-warning-light));
+    color: hsl(var(--admin-warning));
+  }
+  
+  .admin-badge-danger {
+    background-color: hsl(var(--admin-danger-light));
+    color: hsl(var(--admin-danger));
+  }
+  
+  .admin-badge-info {
+    background-color: hsl(var(--admin-info-light));
+    color: hsl(var(--admin-info));
+  }
+  
+  /* Smooth transitions */
+  .admin-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Gradient backgrounds for cards */
+  .admin-gradient-blue {
+    background: linear-gradient(135deg, hsl(var(--admin-primary)) 0%, hsl(231 76% 45%) 100%);
+  }
+  
+  .admin-gradient-green {
+    background: linear-gradient(135deg, hsl(var(--admin-success)) 0%, hsl(142 76% 30%) 100%);
+  }
+  
+  .admin-gradient-orange {
+    background: linear-gradient(135deg, hsl(var(--admin-warning)) 0%, hsl(38 92% 42%) 100%);
+  }
+  
+  .admin-gradient-red {
+    background: linear-gradient(135deg, hsl(var(--admin-danger)) 0%, hsl(0 72% 45%) 100%);
+  }
+}
+
+/* Input and form element styling - Apply to all inputs in admin */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+textarea,
+select {
+  color: hsl(var(--admin-text-primary)) !important;
+}
+
+/* Specific styling for admin-themed inputs */
+input[type="text"].admin-text,
+input[type="email"].admin-text,
+input[type="password"].admin-text,
+input[type="number"].admin-text,
+input[type="search"].admin-text,
+textarea.admin-text,
+select.admin-text {
+  color: hsl(var(--admin-text-primary)) !important;
+  background-color: hsl(var(--admin-card)) !important;
+}
+
+/* Placeholder styling for all inputs */
+input::placeholder,
+textarea::placeholder {
+  color: hsl(var(--admin-text-muted)) !important;
+  opacity: 0.7 !important;
+}
+
+/* Focus states for inputs */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: hsl(var(--admin-primary)) !important;
+  box-shadow: 0 0 0 2px hsl(var(--admin-primary) / 0.1);
+}
+
+/* Ensure text is visible in cards */
+.admin-card input,
+.admin-card textarea,
+.admin-card select {
+  color: hsl(var(--admin-text-primary));
+}
+
+/* Label text visibility */
+label {
+  color: hsl(var(--admin-text-primary));
+}
+
+/* Button text visibility - CRITICAL FIX */
+button {
+  color: hsl(var(--admin-text-primary));
+}
+
+/* Ensure primary buttons have proper styling */
+button[class*="bg-primary"],
+.bg-primary {
+  background-color: hsl(var(--admin-primary)) !important;
+  color: white !important;
+}
+
+/* Outline buttons */
+button[class*="border"] {
+  border-color: hsl(var(--admin-border));
+  color: hsl(var(--admin-text-primary));
+}
+
+/* Ghost buttons */
+button[class*="ghost"] {
+  color: hsl(var(--admin-text-secondary));
+}
+
+/* Destructive buttons */
+button[class*="destructive"] {
+  background-color: hsl(var(--admin-danger)) !important;
+  color: white !important;
+}
+
+/* Link buttons */
+button[class*="link"],
+a[class*="link"] {
+  color: hsl(var(--admin-primary));
+}
+
+/* All text within buttons should be visible */
+button span,
+button svg,
+a span {
+  color: inherit;
+}
+
+/* Dropdown menu items */
+[role="menuitem"] {
+  color: hsl(var(--admin-text-primary));
+}
+
+/* Ensure all text in cards is visible */
+.admin-card h1,
+.admin-card h2,
+.admin-card h3,
+.admin-card h4,
+.admin-card h5,
+.admin-card h6,
+.admin-card p,
+.admin-card span,
+.admin-card div {
+  color: hsl(var(--admin-text-primary));
+}
+
+/* Badge text */
+[class*="badge"],
+.badge {
+  color: inherit;
+}
+
+/* Ensure search icon is visible */
+svg {
+  color: inherit;
+}
+
+/* Custom scrollbar for admin panel */
+.admin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--admin-body));
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--admin-border));
+  border-radius: 3px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--admin-text-muted));
+}
+

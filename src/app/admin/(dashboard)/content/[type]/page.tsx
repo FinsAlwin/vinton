@@ -81,14 +81,16 @@ export default function ContentListPage({
   const capitalizeType = type.charAt(0).toUpperCase() + type.slice(1);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">{capitalizeType}</h1>
-          <p className="text-muted-foreground">Manage your {type} content</p>
+          <h1 className="text-3xl font-bold admin-text mb-2">
+            {capitalizeType}
+          </h1>
+          <p className="admin-text-secondary">Manage your {type} content</p>
         </div>
         <Link href={`/admin/content/${type}/new`}>
-          <Button>
+          <Button className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Create New
           </Button>
@@ -96,50 +98,65 @@ export default function ContentListPage({
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search content..."
-            className="pl-9"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-          />
+      <Card className="p-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 admin-text-muted" />
+            <Input
+              placeholder="Search content..."
+              className="pl-9 admin-card admin-border admin-text"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="admin-border">
+                Status: {statusFilter || "All"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="admin-card admin-border">
+              <DropdownMenuItem
+                onClick={() => setStatusFilter("")}
+                className="admin-text"
+              >
+                All
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setStatusFilter("published")}
+                className="admin-text"
+              >
+                Published
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setStatusFilter("draft")}
+                className="admin-text"
+              >
+                Draft
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Status: {statusFilter || "All"}</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setStatusFilter("")}>
-              All
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setStatusFilter("published")}>
-              Published
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setStatusFilter("draft")}>
-              Draft
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      </Card>
 
       {/* Content List */}
       {isLoading ? (
-        <div className="text-center py-12">Loading...</div>
+        <Card className="p-12">
+          <div className="text-center admin-text-secondary">Loading...</div>
+        </Card>
       ) : content.length === 0 ? (
-        <Card className="p-12 text-center">
-          <p className="text-muted-foreground">No content yet</p>
+        <Card hover="lift" className="p-12 text-center">
+          <p className="admin-text-muted mb-4">No content yet</p>
           <Link href={`/admin/content/${type}/new`}>
-            <Button className="mt-4">Create Your First {capitalizeType}</Button>
+            <Button>Create Your First {capitalizeType}</Button>
           </Link>
         </Card>
       ) : (
-        <Card>
-          <div className="divide-y">
+        <Card hover="lift">
+          <div className="divide-y admin-border">
             {content.map(
               (item: {
                 _id: string;
@@ -151,38 +168,53 @@ export default function ContentListPage({
               }) => (
                 <div
                   key={item._id}
-                  className="flex items-center justify-between p-4 hover:bg-muted/50"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 hover:bg-gray-500/5 admin-transition gap-4"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3">
-                      <h3 className="font-semibold truncate">{item.title}</h3>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h3 className="font-semibold admin-text truncate">
+                        {item.title}
+                      </h3>
                       <Badge
                         variant={
                           item.status === "published" ? "success" : "warning"
+                        }
+                        className={
+                          item.status === "published"
+                            ? "admin-badge-success"
+                            : "admin-badge-warning"
                         }
                       >
                         {item.status}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-sm admin-text-secondary mt-2">
                       {item.description || "No description"}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs admin-text-muted mt-2">
                       Created {formatDate(item.createdAt)} • Updated{" "}
                       {formatDate(item.updatedAt)}
                     </p>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="admin-text-secondary"
+                      >
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent
+                      align="end"
+                      className="admin-card admin-border"
+                    >
                       <DropdownMenuItem
                         onClick={() =>
                           router.push(`/admin/content/${type}/edit/${item._id}`)
                         }
+                        className="admin-text"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
@@ -195,7 +227,7 @@ export default function ContentListPage({
                             title: item.title,
                           })
                         }
-                        className="text-destructive"
+                        className="text-red-500 hover:bg-red-500/10"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
@@ -216,16 +248,18 @@ export default function ContentListPage({
             variant="outline"
             disabled={page === 1}
             onClick={() => setPage(page - 1)}
+            className="admin-border"
           >
             Previous
           </Button>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm admin-text-muted">
             Page {page} of {pagination.totalPages}
           </span>
           <Button
             variant="outline"
             disabled={page === pagination.totalPages}
             onClick={() => setPage(page + 1)}
+            className="admin-border"
           >
             Next
           </Button>

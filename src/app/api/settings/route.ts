@@ -6,6 +6,7 @@ import {
   extractBearerToken,
   verifyAccessToken,
 } from "@/lib/auth";
+import { logSettingsChange } from "@/lib/logger";
 import type { ApiResponse } from "@/types";
 
 export async function GET(request: NextRequest) {
@@ -106,6 +107,16 @@ export async function POST(request: NextRequest) {
       { key },
       { key, value, category, description },
       { upsert: true, new: true }
+    );
+
+    // Log settings change
+    await logSettingsChange(
+      request,
+      { userId: currentUser.userId, email: currentUser.email },
+      key,
+      category || "general",
+      200,
+      { description }
     );
 
     return NextResponse.json<ApiResponse>(

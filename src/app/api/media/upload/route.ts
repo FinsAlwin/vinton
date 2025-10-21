@@ -7,6 +7,7 @@ import {
   verifyAccessToken,
 } from "@/lib/auth";
 import { uploadToS3, generateS3Key } from "@/lib/s3";
+import { logMediaChange } from "@/lib/logger";
 import type { ApiResponse } from "@/types";
 import sharp from "sharp";
 
@@ -82,6 +83,22 @@ export async function POST(request: NextRequest) {
       height,
       uploadedBy: currentUser.userId,
     });
+
+    // Log media upload
+    await logMediaChange(
+      request,
+      "UPLOAD_MEDIA",
+      { userId: currentUser.userId, email: currentUser.email },
+      media._id.toString(),
+      file.name,
+      201,
+      {
+        size: file.size,
+        mimeType: file.type,
+        width,
+        height,
+      }
+    );
 
     return NextResponse.json<ApiResponse>(
       {

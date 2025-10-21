@@ -1,18 +1,10 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/admin/ui/card";
-import {
-  FileText,
-  Image as ImageIcon,
-  LayoutDashboard,
-  Clock,
-} from "lucide-react";
+import { StatsCard } from "@/components/admin/ui/stats-card";
+import { RecentLogs } from "@/components/admin/dashboard/recent-logs";
+import { FileText, Image as ImageIcon, Clock, TrendingUp } from "lucide-react";
 import connectDB from "@/lib/mongodb";
 import Content from "@/models/Content";
 import Media from "@/models/Media";
+import ActivityLog from "@/models/ActivityLog";
 
 export const dynamic = "force-dynamic";
 
@@ -20,15 +12,15 @@ async function getDashboardStats() {
   try {
     await connectDB();
 
-    const [totalContent, publishedContent, totalMedia, recentContent] =
+    const [totalContent, publishedContent, totalMedia, recentLogs] =
       await Promise.all([
         Content.countDocuments(),
         Content.countDocuments({ status: "published" }),
         Media.countDocuments(),
-        Content.find()
-          .sort({ createdAt: -1 })
-          .limit(5)
-          .select("title contentType status createdAt")
+        ActivityLog.find()
+          .sort({ timestamp: -1 })
+          .limit(10)
+          .populate("user", "email")
           .lean(),
       ]);
 
@@ -36,9 +28,15 @@ async function getDashboardStats() {
       totalContent,
       publishedContent,
       totalMedia,
-      recentContent: recentContent.map((item) => ({
-        ...item,
-        _id: item._id.toString(),
+      drafts: totalContent - publishedContent,
+      recentLogs: recentLogs.map((log) => ({
+        _id: log._id.toString(),
+        email: log.email || (log.user as { email?: string })?.email,
+        action: log.action,
+        resource: log.resource,
+        timestamp: log.timestamp,
+        statusCode: log.statusCode,
+        ipAddress: log.ipAddress,
       })),
     };
   } catch (error) {
@@ -47,7 +45,8 @@ async function getDashboardStats() {
       totalContent: 0,
       publishedContent: 0,
       totalMedia: 0,
-      recentContent: [],
+      drafts: 0,
+      recentLogs: [],
     };
   }
 }
@@ -56,108 +55,49 @@ export default async function AdminDashboard() {
   const stats = await getDashboardStats();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 sm:space-y-8">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome to the Vinton admin panel
+        <h1 className="text-3xl font-bold admin-text mb-2">Dashboard</h1>
+        <p className="admin-text-secondary">
+          Welcome back! Here&apos;s an overview of your content.
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Content</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalContent}</div>
-            <p className="text-xs text-muted-foreground">All content items</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Published</CardTitle>
-            <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.publishedContent}</div>
-            <p className="text-xs text-muted-foreground">Live content items</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Media Files</CardTitle>
-            <ImageIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalMedia}</div>
-            <p className="text-xs text-muted-foreground">Uploaded media</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Drafts</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats.totalContent - stats.publishedContent}
-            </div>
-            <p className="text-xs text-muted-foreground">Unpublished items</p>
-          </CardContent>
-        </Card>
+      {/* Stats Cards Grid */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <StatsCard
+          title="Total Content"
+          value={stats.totalContent}
+          icon={FileText}
+          description="All content items"
+          iconColor="blue"
+        />
+        <StatsCard
+          title="Published"
+          value={stats.publishedContent}
+          icon={TrendingUp}
+          description="Live content items"
+          iconColor="green"
+        />
+        <StatsCard
+          title="Media Files"
+          value={stats.totalMedia}
+          icon={ImageIcon}
+          description="Uploaded media"
+          iconColor="purple"
+        />
+        <StatsCard
+          title="Drafts"
+          value={stats.drafts}
+          icon={Clock}
+          description="Unpublished items"
+          iconColor="orange"
+        />
       </div>
 
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Content</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {stats.recentContent.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No content yet</p>
-          ) : (
-            <div className="space-y-4">
-              {stats.recentContent.map(
-                (item: {
-                  _id: string;
-                  title: string;
-                  contentType: string;
-                  status: string;
-                  createdAt: string | Date;
-                }) => (
-                  <div
-                    key={item._id}
-                    className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0"
-                  >
-                    <div>
-                      <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {item.contentType} •{" "}
-                        {new Date(item.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span
-                      className={`rounded-full px-2 py-1 text-xs font-medium ${
-                        item.status === "published"
-                          ? "bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))]"
-                          : "bg-[hsl(var(--warning))] text-[hsl(var(--warning-foreground))]"
-                      }`}
-                    >
-                      {item.status}
-                    </span>
-                  </div>
-                )
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Recent Activity Logs */}
+      <RecentLogs logs={stats.recentLogs} />
     </div>
   );
 }

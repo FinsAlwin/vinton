@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
+import { logAuthEvent } from "@/lib/logger";
 import type { ApiResponse } from "@/types";
 
 export async function POST(request: NextRequest) {
@@ -50,6 +51,12 @@ export async function POST(request: NextRequest) {
       email,
       password: hashedPassword,
       role: role || "admin",
+    });
+
+    // Log user registration
+    await logAuthEvent(request, "REGISTER_USER", user.email, {
+      role: user.role,
+      userId: user._id.toString(),
     });
 
     return NextResponse.json<ApiResponse>(

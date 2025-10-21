@@ -391,6 +391,7 @@ export default function SettingsPage() {
             value={String(value || "")}
             onChange={(e) => handleChange(field.key, e.target.value)}
             placeholder={field.placeholder}
+            className="admin-card admin-border admin-text"
           />
         );
 
@@ -401,6 +402,7 @@ export default function SettingsPage() {
             value={String(value || "")}
             onChange={(e) => handleChange(field.key, e.target.value)}
             placeholder={field.placeholder}
+            className="admin-card admin-border admin-text"
           />
         );
 
@@ -411,6 +413,7 @@ export default function SettingsPage() {
             onChange={(e) => handleChange(field.key, e.target.value)}
             placeholder={field.placeholder}
             rows={4}
+            className="admin-card admin-border admin-text"
           />
         );
 
@@ -421,7 +424,7 @@ export default function SettingsPage() {
               checked={Boolean(value)}
               onCheckedChange={(checked) => handleChange(field.key, checked)}
             />
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm admin-text-muted">
               {Boolean(value) ? "Enabled" : "Disabled"}
             </span>
           </div>
@@ -432,7 +435,7 @@ export default function SettingsPage() {
         return (
           <div className="space-y-3">
             {imageUrl && (
-              <div className="relative w-48 h-32 rounded-lg overflow-hidden border">
+              <div className="relative w-48 h-32 rounded-lg overflow-hidden admin-border border">
                 <Image
                   src={imageUrl}
                   alt={field.label}
@@ -441,7 +444,7 @@ export default function SettingsPage() {
                 />
               </div>
             )}
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Button
                 type="button"
                 variant="outline"
@@ -449,6 +452,7 @@ export default function SettingsPage() {
                   setCurrentImageField(field.key);
                   setMediaPickerOpen(true);
                 }}
+                className="admin-border"
               >
                 {imageUrl ? "Change Image" : "Select Image"}
               </Button>
@@ -476,51 +480,59 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <p>Loading settings...</p>
-      </div>
+      <Card className="p-12">
+        <div className="flex items-center justify-center">
+          <p className="admin-text-secondary">Loading settings...</p>
+        </div>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold admin-text mb-2">Settings</h1>
+          <p className="admin-text-secondary">
             Manage your application settings and configuration
           </p>
         </div>
-        <Button onClick={handleSave} disabled={saving || !hasChanges}>
+        <Button
+          onClick={handleSave}
+          disabled={saving || !hasChanges}
+          className="w-full sm:w-auto"
+        >
           <Save className="mr-2 h-4 w-4" />
           {saving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b">
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === category.id
-                ? "border-b-2 border-primary text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => handleTabChange(category.id)}
-          >
-            {category.label}
-          </button>
-        ))}
-      </div>
+      <Card className="p-2">
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              className={`px-4 py-2.5 font-medium rounded-lg transition-all ${
+                activeTab === category.id
+                  ? "admin-primary-bg text-white shadow-sm"
+                  : "admin-text-secondary hover:bg-gray-500/10"
+              }`}
+              onClick={() => handleTabChange(category.id)}
+            >
+              {category.label}
+            </button>
+          ))}
+        </div>
+      </Card>
 
       {/* Settings Form */}
-      <Card>
+      <Card hover="lift">
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="admin-text text-xl">
             {categories.find((c) => c.id === activeTab)?.label} Settings
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="admin-text-secondary">
             Configure your{" "}
             {categories.find((c) => c.id === activeTab)?.label.toLowerCase()}{" "}
             settings
@@ -529,12 +541,12 @@ export default function SettingsPage() {
         <CardContent className="space-y-6">
           {currentFields.map((field) => (
             <div key={field.key} className="space-y-2">
-              <Label htmlFor={field.key}>{field.label}</Label>
+              <Label htmlFor={field.key} className="admin-text font-medium">
+                {field.label}
+              </Label>
               {renderField(field)}
               {field.description && (
-                <p className="text-sm text-muted-foreground">
-                  {field.description}
-                </p>
+                <p className="text-sm admin-text-muted">{field.description}</p>
               )}
             </div>
           ))}

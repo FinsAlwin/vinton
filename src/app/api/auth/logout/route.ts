@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { clearAuthCookies, getRefreshToken, getCurrentUser } from "@/lib/auth";
+import { logAuthEvent } from "@/lib/logger";
 import type { ApiResponse } from "@/types";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
     const refreshToken = await getRefreshToken();
     const currentUser = await getCurrentUser();
@@ -15,6 +16,11 @@ export async function POST() {
       // Remove refresh token from database
       await User.findByIdAndUpdate(currentUser.userId, {
         $pull: { refreshTokens: refreshToken },
+      });
+
+      // Log logout event
+      await logAuthEvent(request, "LOGOUT", currentUser.email, {
+        userId: currentUser.userId,
       });
     }
 

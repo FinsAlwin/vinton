@@ -7,6 +7,7 @@ import {
   verifyAccessToken,
 } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
+import { logContentChange } from "@/lib/logger";
 import type { ApiResponse } from "@/types";
 
 // GET - Get single content item
@@ -136,6 +137,22 @@ export async function PUT(
     Object.assign(content, body);
     await content.save();
 
+    // Log content update
+    await logContentChange(
+      request,
+      "UPDATE_CONTENT",
+      { userId: currentUser.userId, email: currentUser.email },
+      id,
+      type,
+      content.title,
+      200,
+      {
+        slug: content.slug,
+        status: content.status,
+        updatedFields: Object.keys(body),
+      }
+    );
+
     return NextResponse.json<ApiResponse>(
       {
         success: true,
@@ -199,6 +216,20 @@ export async function DELETE(
         { status: 404 }
       );
     }
+
+    // Log content deletion
+    await logContentChange(
+      request,
+      "DELETE_CONTENT",
+      { userId: currentUser.userId, email: currentUser.email },
+      id,
+      type,
+      content.title,
+      200,
+      {
+        slug: content.slug,
+      }
+    );
 
     return NextResponse.json<ApiResponse>(
       {

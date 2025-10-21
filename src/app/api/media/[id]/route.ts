@@ -7,6 +7,7 @@ import {
   verifyAccessToken,
 } from "@/lib/auth";
 import { deleteFromS3 } from "@/lib/s3";
+import { logMediaChange } from "@/lib/logger";
 import type { ApiResponse } from "@/types";
 
 export async function DELETE(
@@ -55,6 +56,21 @@ export async function DELETE(
 
     // Delete from database
     await Media.findByIdAndDelete(id);
+
+    // Log media deletion
+    await logMediaChange(
+      request,
+      "DELETE_MEDIA",
+      { userId: currentUser.userId, email: currentUser.email },
+      id,
+      media.originalName,
+      200,
+      {
+        s3Key: media.s3Key,
+        size: media.size,
+        mimeType: media.mimeType,
+      }
+    );
 
     return NextResponse.json<ApiResponse>(
       {

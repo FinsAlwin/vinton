@@ -7,6 +7,7 @@ import {
   FileText,
   Image as ImageIcon,
   Settings,
+  ScrollText,
   ChevronLeft,
   Menu,
   X,
@@ -44,6 +45,11 @@ const defaultMenuItems: SidebarItem[] = [
     href: "/admin/settings",
     icon: Settings,
   },
+  {
+    title: "Logs",
+    href: "/admin/logs",
+    icon: ScrollText,
+  },
 ];
 
 interface AdminSidebarProps {
@@ -80,7 +86,7 @@ export function AdminSidebar({
       {/* Mobile Menu Button */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-lg bg-card border border-border shadow-lg hover:bg-accent text-foreground"
+        className="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-lg admin-card-bg admin-border border shadow-lg hover:opacity-80 admin-text transition-opacity"
         aria-label="Toggle menu"
       >
         {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -97,9 +103,7 @@ export function AdminSidebar({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-40 h-screen border-r border-border transition-all duration-300",
-          // Solid opaque background with backdrop blur for mobile
-          "bg-card backdrop-blur-sm",
+          "fixed left-0 top-0 z-40 h-screen admin-sidebar-bg admin-border border-r transition-all duration-300",
           "shadow-xl lg:shadow-none",
           // Desktop (always visible, width changes based on collapsed state)
           collapsed ? "lg:w-16" : "lg:w-64",
@@ -107,13 +111,15 @@ export function AdminSidebar({
           "w-64",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
-        style={{ backgroundColor: "hsl(var(--card))" }}
       >
         <div className="flex h-full flex-col">
           {/* Logo/Header */}
-          <div className="flex h-16 items-center justify-between border-b border-border px-4">
+          <div className="flex h-16 items-center justify-between admin-border border-b px-4">
             {!collapsed && (
-              <Link href="/admin" className="flex items-center gap-2">
+              <Link
+                href="/admin"
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
                 {siteLogo && (
                   <div className="relative w-8 h-8">
                     <Image
@@ -124,13 +130,16 @@ export function AdminSidebar({
                     />
                   </div>
                 )}
-                <span className="text-xl font-bold text-foreground">
-                  {siteName || "Vinton"} Admin
+                <span className="text-xl font-bold admin-text">
+                  {siteName || "Vinton"}
                 </span>
               </Link>
             )}
             {collapsed && siteLogo && (
-              <Link href="/admin" className="flex items-center">
+              <Link
+                href="/admin"
+                className="flex items-center hover:opacity-80 transition-opacity"
+              >
                 <div className="relative w-8 h-8">
                   <Image
                     src={siteLogo}
@@ -145,7 +154,10 @@ export function AdminSidebar({
               variant="ghost"
               size="icon"
               onClick={() => setCollapsed(!collapsed)}
-              className={cn(collapsed && !siteLogo && "mx-auto")}
+              className={cn(
+                "admin-text-secondary hover:admin-text hidden lg:flex",
+                collapsed && !siteLogo && "mx-auto"
+              )}
             >
               <ChevronLeft
                 className={cn(
@@ -157,7 +169,7 @@ export function AdminSidebar({
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 p-2">
+          <nav className="flex-1 space-y-1 p-3 overflow-y-auto admin-scrollbar">
             {items.map((item) => {
               // Fix active tab detection to handle exact match for /admin
               const isActive =
@@ -170,13 +182,12 @@ export function AdminSidebar({
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all relative",
-                    isActive
-                      ? "bg-primary/20 text-primary border-l-4 border-primary shadow-sm hover:bg-primary/30"
-                      : "text-muted-foreground border-l-4 border-transparent hover:bg-accent hover:text-foreground hover:border-accent",
-                    collapsed && "justify-center"
+                    "admin-sidebar-link",
+                    isActive && "admin-sidebar-link-active",
+                    collapsed && "justify-center px-2"
                   )}
                   title={collapsed ? item.title : undefined}
+                  aria-label={item.title}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
                   {!collapsed && <span>{item.title}</span>}
